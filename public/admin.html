@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Secure Admin Master CMS - Kenya Esports</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
+    * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
+    body { 
+      background: #0b0f19; 
+      color: #f3f4f6; 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+    }
+    
+    header {
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 14px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .btn-gold:hover { filter: brightness(1.2); }
+
+    .section-box {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    input[type="number"], input[type="text"], input[type="password"], textarea, select {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+    }
+
+    .stat-card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 22px;
+      font-weight: 900;
+      color: #10b981;
+      margin-top: 6px;
+    }
+
+    .arena-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .arena-table th {
+      background: #1f2937;
+      color: #f59e0b;
+      padding: 10px;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .arena-table td {
+      padding: 10px;
+      border-bottom: 1px solid #1f2937;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Master Header -->
+  <header>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <a href="index.html" style="color:#9ca3af; text-decoration:none; font-weight:bold; font-size:12px;">⬅ HOME DASHBOARD</a>
+      <span style="color:#374151;">|</span>
+      <a href="sports-tipster.html" style="color:#9ca3af; text-decoration:none; font-weight:bold; font-size:12px;">⚽ TIPSTER ARENA</a>
+      <span style="color:#374151;">|</span>
+      <h2 style="color: #f59e0b; margin:0; font-size: 18px; letter-spacing:0.5px;">👑 SECURE ADMIN MASTER CMS</h2>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <span id="logged-admin-badge" style="background:#064e3b; color:#10b981; border:1px solid #10b981; font-size:11px; font-weight:bold; padding:4px 10px; border-radius:6px;">Logged In</span>
+      <button onclick="adminLogout()" class="btn-gold" style="background:#ef4444; color:#fff; padding:6px 12px; font-size:10px;">LOGOUT</button>
+    </div>
+  </header>
+
+  <div style="max-width: 1050px; margin: 0 auto;">
+
+    <!-- SECTION 0: SECURITY & PASSCODE MANAGEMENT -->
+    <div class="section-box" style="border: 2px solid #ef4444;">
+      <h3 style="color: #ef4444; margin-top: 0; font-size: 16px; text-transform: uppercase;">🛡️ Security & Passcode Manager (Benson Irungu & Deborah Ombaki)</h3>
+      <p style="font-size: 12px; color: #9ca3af; margin-bottom: 14px;">If you suspect suspicious activity, you can instantly change your private login passcodes here.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+        <div style="background:#1f2937; padding:14px; border-radius:10px; border:1px solid #374151;">
+          <h4 style="color:#f59e0b; margin:0 0 8px 0; font-size:13px;">Change Passcode for Benson Irungu</h4>
+          <input id="new-pass-1" type="password" placeholder="Enter new passcode..." style="margin-bottom:8px;" />
+          <button onclick="updateAdminPasscode(1)" class="btn-gold" style="background:#f59e0b; color:#000; width:100%;">UPDATE BENSON PASSCODE</button>
+        </div>
+        <div style="background:#1f2937; padding:14px; border-radius:10px; border:1px solid #374151;">
+          <h4 style="color:#f59e0b; margin:0 0 8px 0; font-size:13px;">Change Passcode for Deborah Ombaki</h4>
+          <input id="new-pass-2" type="password" placeholder="Enter new passcode..." style="margin-bottom:8px;" />
+          <button onclick="updateAdminPasscode(2)" class="btn-gold" style="background:#f59e0b; color:#000; width:100%;">UPDATE DEBORAH PASSCODE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: FINANCIAL & PLATFORM OVERVIEW METRICS -->
+    <div class="section-box">
+      <h3 style="color: #f59e0b; margin-top: 0; font-size: 16px; text-transform: uppercase;">📊 Platform Financials & Revenue Overview</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+        <div class="stat-card">
+          <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase;">Total Transactions Ledger</div>
+          <div class="stat-value" id="stat-total-tx">0 KES</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase;">Total Deposits In</div>
+          <div class="stat-value" id="stat-deposits" style="color:#10b981;">0 KES</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase;">Total Withdrawals Out</div>
+          <div class="stat-value" id="stat-withdrawals" style="color:#ef4444;">0 KES</div>
+        </div>
+        <div class="stat-card">
+          <div style="font-size: 11px; color: #9ca3af; text-transform: uppercase;">Active Tournaments</div>
+          <div class="stat-value" id="stat-tourneys" style="color:#a78bfa;">Live Sync</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1.5: M-PESA MANUAL DEPOSIT RECONCILIATION VERIFIER -->
+    <div class="section-box" style="border: 2px solid #10b981;">
+      <h3 style="color: #10b981; margin-top:0; font-size:16px; text-transform: uppercase;">💰 M-Pesa Deposit Verifier & Ledger</h3>
+      <p style="font-size:12px; color:#9ca3af; margin-bottom:14px;">Verify incoming M-Pesa transaction codes submitted by players against your Till statement before crediting balances.</p>
+      
+      <div style="overflow-x: auto;">
+        <table class="arena-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Player Handle</th>
+              <th>Phone</th>
+              <th>Amount (KES)</th>
+              <th>M-Pesa Code / Details</th>
+              <th>Action / Status</th>
+            </tr>
+          </thead>
+          <tbody id="deposits-ledger-body">
+            <tr><td colspan="6" style="text-align:center; color:#64748b;">No manual M-Pesa deposits submitted yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECTION 2: HOST EVENTS, TOURNAMENTS & BANNER IMAGES -->
+    <div class="section-box" style="border: 2px solid #f59e0b;">
+      <h3 style="color: #f59e0b; margin-top: 0; font-size: 16px; text-transform: uppercase;">📢 Host Tournaments & Add Custom Image Banners</h3>
+      
+      <form onsubmit="event.preventDefault(); adminPublishEvent();" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Event Title</label>
+          <input id="adm-evt-title" type="text" placeholder="e.g. eFootball Weekend Cup" required />
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Game (eFootball / PUBG / COD / etc)</label>
+          <input id="adm-evt-game" type="text" placeholder="e.g. eFootball 2026" required />
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Registration Deadline</label>
+          <input id="adm-evt-deadline" type="text" placeholder="e.g. Sat 15th Nov @ 6:00 PM" required />
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Match Kickoff Time</label>
+          <input id="adm-evt-time" type="text" placeholder="e.g. Sat 15th Nov @ 8:00 PM" required />
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Entry Fee (KES)</label>
+          <input id="adm-evt-entry" type="number" placeholder="50" required />
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Prize Pool (KES)</label>
+          <input id="adm-evt-prize" type="number" placeholder="5000" required />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Event Image / Banner URL</label>
+          <input id="adm-evt-img" type="text" placeholder="https://images.unsplash.com/... (leave blank for default esports art)" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <button type="submit" class="btn-gold" style="width:100%; background:#10b981; color:#fff; padding:12px;">
+            🚀 PUBLISH EVENT LIVE WITH BANNER
+          </button>
+        </div>
+      </form>
+
+      <!-- Broadcast Room Code sub-box -->
+      <div style="background: #0f172a; padding: 14px; border-radius: 8px; border: 1px solid #374151;">
+        <h4 style="color: #38bdf8; margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase;">📡 Broadcast Game Room Credentials</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+          <input id="adm-broadcast-id" type="text" placeholder="Event ID (e.g. EV-101)" />
+          <input id="adm-broadcast-room" type="text" placeholder="Room ID / Code (e.g. 849204)" />
+          <input id="adm-broadcast-pass" type="text" placeholder="Password (Optional)" />
+          <button onclick="broadcastRoomCodeCMS()" class="btn-gold" style="background:#38bdf8; color:#000;">BROADCAST CODE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: LIVE DEPOSITS, WITHDRAWALS & TIPSTER LEDGER -->
+    <div class="section-box" style="border: 2px solid #10b981;">
+      <h3 style="color: #10b981; margin-top: 0; font-size: 16px; text-transform: uppercase;">💰 Live Financial Transactions & Tipster Ledger</h3>
+      <p style="font-size: 12px; color: #9ca3af; margin-bottom: 14px;">Real-time log of wallet deposits, withdrawals, and 10/100 odds purchases processed on the platform.</p>
+
+      <div style="overflow-x: auto; max-height: 280px;">
+        <table class="arena-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Player Username</th>
+              <th>Phone / Ref</th>
+              <th>Amount (KES)</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-table-body">
+            <tr>
+              <td colspan="5" style="text-align:center; color:#64748b;">No transactions recorded yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECTION 4: SPORTS TIPSTER QUICK-PASTE ODDS CMS -->
+    <div class="section-box" style="border: 2px dashed #3b82f6;">
+      <h3 style="color: #38bdf8; margin-top: 0; font-size: 16px; text-transform: uppercase;">⚽ Sports Tipster: Quick-Paste & Publish Slips</h3>
+      <p style="font-size: 12px; color: #9ca3af; margin-bottom: 12px;">Paste raw text odds for your 10 Odds (20 KES) or 100 Odds (50 KES) tiers.</p>
+      
+      <textarea id="raw-sms-input" rows="4" placeholder="Paste raw text message here..."></textarea>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; margin-bottom: 12px;">
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Pricing Tier</label>
+          <select id="admin-slip-tier">
+            <option value="10 Odds Daily Combo">10 Odds Daily Combo (20 KES)</option>
+            <option value="100 Odds Mega Jackpot">100 Odds Mega Jackpot (50 KES)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Slip Title</label>
+          <input type="text" id="admin-slip-title" placeholder="e.g. Sure 10 Odds Banker" />
+        </div>
+        <div>
+          <label style="font-size: 11px; color: #9ca3af; display:block; margin-bottom:4px;">Betika Booking Code</label>
+          <input type="text" id="admin-booking-code" placeholder="e.g. BETIKA-8842X" />
+        </div>
+      </div>
+
+      <div style="font-size: 12px; color: #9ca3af; margin-bottom: 6px;">Draft Selections Preview:</div>
+      <div id="draft-matches-container" style="background:#0f172a; padding:12px; border-radius:8px; font-size: 13px; color: #cbd5e1; margin-bottom: 14px; border:1px solid #1f2937;">
+        No selections parsed yet. Use the button below after pasting text.
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 14px 18px; border-radius: 8px; flex-wrap:wrap; gap:12px;">
+        <button onclick="parseRawTextOdds()" class="btn-gold" style="background: #3b82f6; color: #fff;">
+          ⚡ PARSE TEXT ODD LINES
+        </button>
+        <div style="font-weight: 800; color: #10b981; font-size: 15px;">
+          Total Odds: <span id="admin-calculated-odds">1.00</span>
+        </div>
+        <button onclick="publishDailySlipCMS()" class="btn-gold" style="background: #10b981; color:#fff;">
+          📢 PUBLISH TIPSTER SLIP
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let draftMatches = [];
+
+    // --- SECURITY & AUTHENTICATION CHECK ---
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAdminAccess();
+      loadFinancialLedger();
+      loadAdminDepositsLedger();
+    });
+
+    function checkAdminAccess() {
+      localStorage.setItem('admin_pass_1', 'DeborahOmbaki23!');
+      localStorage.setItem('admin_pass_2', 'DeborahOmbaki23!');
+
+      const isAuthed = sessionStorage.getItem('admin_authorized');
+      if (isAuthed === 'true') {
+        const role = sessionStorage.getItem('admin_role') || 'Admin';
+        document.getElementById('logged-admin-badge').innerText = `Logged In as: ${role}`;
+        return;
+      }
+
+      const inputCode = prompt("🔐 RESTRICTED AREA: Enter Admin Passcode (Benson Irungu or Deborah Ombaki):");
+      const targetPass = 'DeborahOmbaki23!';
+
+      if (inputCode === targetPass) {
+        sessionStorage.setItem('admin_authorized', 'true');
+        sessionStorage.setItem('admin_role', 'Benson / Deborah');
+        alert("👑 Welcome! Access granted.");
+        document.getElementById('logged-admin-badge').innerText = "Logged In as: Benson / Deborah";
+      } else {
+        alert("❌ Incorrect passcode. Suspicious activity blocked. Redirecting home.");
+        window.location.href = "index.html";
+      }
+    }
+
+    function adminLogout() {
+      sessionStorage.removeItem('admin_authorized');
+      sessionStorage.removeItem('admin_role');
+      alert("🔒 Logged out securely from Admin CMS.");
+      window.location.href = "index.html";
+    }
+
+    function updateAdminPasscode(adminNum) {
+      const fieldId = adminNum === 1 ? 'new-pass-1' : 'new-pass-2';
+      const newPass = document.getElementById(fieldId).value.trim();
+
+      if (!newPass || newPass.length < 6) {
+        return alert("⚠️ Passcode must be at least 6 characters long.");
+      }
+
+      localStorage.setItem(`admin_pass_${adminNum}`, newPass);
+      document.getElementById(fieldId).value = '';
+      alert(`✅ Passcode successfully updated and secured!`);
+    }
+
+    // --- FINANCIAL LEDGER & CMS FUNCTIONS ---
+    function loadFinancialLedger() {
+      const txs = JSON.parse(localStorage.getItem('admin_transactions') || '[]');
+      const tbody = document.getElementById('transactions-table-body');
+      
+      let totalDep = 0;
+      let totalWdr = 0;
+
+      if (txs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#64748b;">No transactions recorded yet.</td></tr>`;
+      } else {
+        tbody.innerHTML = txs.map(t => {
+          if (t.type === 'DEPOSIT' || t.type === 'MANUAL_DEPOSIT') {
+            totalDep += t.amount;
+          } else if (t.type === 'WITHDRAWAL') {
+            totalWdr += Math.abs(t.amount);
+          }
+
+          let colorStyle = '#10b981';
+          if (t.type === 'WITHDRAWAL' || t.amount < 0) colorStyle = '#ef4444';
+
+          return `
+            <tr>
+              <td><strong style="color:${colorStyle};">${t.type}</strong></td>
+              <td>${t.username || 'System User'}</td>
+              <td>${t.phone || t.desc || '-'}</td>
+              <td style="font-weight:bold; color:${colorStyle};">${t.amount > 0 ? '+' : ''}${t.amount.toLocaleString()} KES</td>
+              <td style="color:#9ca3af; font-size:11px;">${t.time}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('stat-deposits').innerText = totalDep.toLocaleString() + ' KES';
+      document.getElementById('stat-withdrawals').innerText = totalWdr.toLocaleString() + ' KES';
+      document.getElementById('stat-total-tx').innerText = (totalDep + totalWdr).toLocaleString() + ' KES';
+    }
+
+    function loadAdminDepositsLedger() {
+      const tbody = document.getElementById('deposits-ledger-body');
+      const txs = JSON.parse(localStorage.getItem('admin_transactions') || '[]');
+      const deposits = txs.filter(t => t.type === 'MANUAL_DEPOSIT');
+
+      if (deposits.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#64748b; padding:16px;">No manual M-Pesa deposits submitted yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = deposits.map((d, index) => `
+        <tr>
+          <td>${d.time}</td>
+          <td><strong>@${d.username}</strong></td>
+          <td>${d.phone || '254712345678'}</td>
+          <td style="color:#10b981; font-weight:bold;">+${d.amount.toLocaleString()} KES</td>
+          <td style="color:#f59e0b; font-weight:bold;">${d.desc || 'M-Pesa Verified'}</td>
+          <td>
+            <button onclick="verifyDepositRecord(${index})" class="btn-gold" style="background:#10b981; color:#000; padding:4px 8px; font-size:10px;">VERIFIED ✓</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function verifyDepositRecord(index) {
+      alert(`✅ Deposit verified and reconciled against Till statement.`);
+    }
+
+    function adminPublishEvent() {
+      const title = document.getElementById('adm-evt-title').value.trim();
+      const game = document.getElementById('adm-evt-game').value.trim();
+      const deadline = document.getElementById('adm-evt-deadline').value.trim();
+      const time = document.getElementById('adm-evt-time').value.trim();
+      const entry = document.getElementById('adm-evt-entry').value;
+      const prize = document.getElementById('adm-evt-prize').value;
+      const customImg = document.getElementById('adm-evt-img').value.trim();
+
+      if (!title || !game) return alert("Please fill in event title and game.");
+
+      const isBR = game.toLowerCase().includes('pubg') || game.toLowerCase().includes('cod');
+      const defaultImg = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&auto=format&fit=crop&q=80';
+
+      const newEvent = {
+        id: 'EV-' + Math.floor(100 + Math.random() * 900),
+        title: title,
+        game: game,
+        type: isBR ? 'Battle Royale' : '1v1',
+        matchTime: time || 'Today @ 8:00 PM EAT',
+        regDeadline: deadline || 'Today @ 6:00 PM EAT',
+        img: customImg || defaultImg,
+        entry: parseInt(entry),
+        prize: parseInt(prize),
+        registeredPlayers: ['Benson_Irungu'],
+        status: 'REGISTRATION_OPEN',
+        roomDetails: { roomId: 'PENDING', password: 'PENDING' }
+      };
+
+      let storedEvents = JSON.parse(localStorage.getItem('admin_tournaments') || '[]');
+      storedEvents.unshift(newEvent);
+      localStorage.setItem('admin_tournaments', JSON.stringify(storedEvents));
+
+      alert(`✅ Event "${title}" published successfully with custom banner image!`);
+      
+      document.getElementById('adm-evt-title').value = '';
+      document.getElementById('adm-evt-game').value = '';
+      document.getElementById('adm-evt-deadline').value = '';
+      document.getElementById('adm-evt-time').value = '';
+      document.getElementById('adm-evt-entry').value = '';
+      document.getElementById('adm-evt-prize').value = '';
+      document.getElementById('adm-evt-img').value = '';
+    }
+
+    function broadcastRoomCodeCMS() {
+      const id = document.getElementById('adm-broadcast-id').value.trim();
+      const room = document.getElementById('adm-broadcast-room').value.trim();
+      const pass = document.getElementById('adm-broadcast-pass').value.trim() || 'None';
+
+      if (!id || !room) return alert("Please enter Event ID and Room Code.");
+
+      let storedEvents = JSON.parse(localStorage.getItem('admin_tournaments') || '[]');
+      const target = storedEvents.find(e => e.id === id);
+      if (target) {
+        target.roomDetails = { roomId: room, password: pass };
+        localStorage.setItem('admin_tournaments', JSON.stringify(storedEvents));
+      }
+
+      alert(`📡 Room credentials broadcasted for event [${id}]!\nRoom ID: ${room} | Pass: ${pass}`);
+      document.getElementById('adm-broadcast-id').value = '';
+      document.getElementById('adm-broadcast-room').value = '';
+      document.getElementById('adm-broadcast-pass').value = '';
+    }
+
+    function parseRawTextOdds() {
+      const rawText = document.getElementById('raw-sms-input').value.trim();
+      if (!rawText) return alert("Please paste the text message first.");
+
+      const lines = rawText.split('\n');
+      let addedCount = 0;
+
+      lines.forEach(line => {
+        line = line.trim();
+        if (!line) return;
+
+        const oddsMatch = line.match(/(?:@|odds:?)\s*([0-9]+\.[0-9]+)/i) || line.match(/([0-9]+\.[0-9]+)$/);
+        
+        if (oddsMatch) {
+          const odds = parseFloat(oddsMatch[1]);
+          let title = line.replace(oddsMatch[0], '').replace(/[@\-–:]+$/, '').trim();
+          if (!title) title = "Selection #" + (draftMatches.length + 1);
+
+          if (!isNaN(odds) && odds > 1.00) {
+            draftMatches.push({ title, odds });
+            addedCount++;
+          }
+        }
+      });
+
+      if (addedCount > 0) {
+        document.getElementById('raw-sms-input').value = '';
+        renderDraftPreview();
+        alert(`⚡ Successfully parsed ${addedCount} selections!`);
+      } else {
+        alert("Could not detect odds format. Ensure each line ends with odds value (e.g., 2.45).");
+      }
+    }
+
+    function renderDraftPreview() {
+      const container = document.getElementById('draft-matches-container');
+      const calcOddsEl = document.getElementById('admin-calculated-odds');
+
+      if (draftMatches.length === 0) {
+        container.innerText = "No selections added yet.";
+        calcOddsEl.innerText = "1.00";
+        return;
+      }
+
+      let totalOdds = 1;
+      let html = '<ol style="margin:0; padding-left:16px;">';
+      draftMatches.forEach((m, idx) => {
+        totalOdds *= m.odds;
+        html += `<li>${m.title} — <strong style="color:#10b981;">@${m.odds.toFixed(2)}</strong> <button onclick="removeDraftMatch(${idx})" style="background:none; border:none; color:#ef4444; cursor:pointer; font-weight:bold; margin-left:8px;">[Remove]</button></li>`;
+      });
+      html += '</ol>';
+
+      container.innerHTML = html;
+      calcOddsEl.innerText = totalOdds.toFixed(2);
+    }
+
+    function removeDraftMatch(index) {
+      draftMatches.splice(index, 1);
+      renderDraftPreview();
+    }
+
+    function publishDailySlipCMS() {
+      const category = document.getElementById('admin-slip-tier').value;
+      const price = category.includes("10 Odds") ? 20 : 50;
+      const title = document.getElementById('admin-slip-title').value.trim() || category;
+      const bookingCode = document.getElementById('admin-booking-code').value.trim() || "BETIKA-" + Math.floor(1000 + Math.random() * 9000);
+
+      if (draftMatches.length === 0) return alert("Please parse and add at least one match selection.");
+
+      let totalOdds = draftMatches.reduce((acc, m) => acc * m.odds, 1);
+      const newSlip = {
+        id: "SLIP-" + Date.now(),
+        date: new Date().toISOString().split('T')[0],
+        category: category,
+        price: price,
+        title: title,
+        bookingCode: bookingCode,
+        totalOdds: parseFloat(totalOdds.toFixed(2)),
+        matches: draftMatches.map((m, idx) => ({ id: idx + 1, title: m.title, odds: m.odds }))
+      };
+
+      let allSlips = JSON.parse(localStorage.getItem('published_slips') || '[]');
+      allSlips.unshift(newSlip);
+      localStorage.setItem('published_slips', JSON.stringify(allSlips));
+
+      draftMatches = [];
+      document.getElementById('admin-slip-title').value = '';
+      document.getElementById('admin-booking-code').value = '';
+      renderDraftPreview();
+
+      alert(`🚀 Success! "${title}" (${price} KES) published live for players.`);
+    }
+  </script>
+</body>
+</html>

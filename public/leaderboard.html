@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenya Esports | Leaderboard & Rankings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --card-bg: rgba(17, 24, 39, 0.85);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --neon-green: #00ff88;
+            --neon-cyan: #00e5ff;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 2rem 1rem; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 1.5rem; }
+
+        header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 1.2rem 1.8rem; border-radius: 14px; border: 1px solid var(--card-border); }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 900; color: var(--neon-green); }
+
+        .card { background: var(--card-bg); border-radius: 14px; border: 1px solid var(--card-border); padding: 1.6rem; display: flex; flex-direction: column; gap: 1.2rem; }
+        .card h2 { font-family: 'Orbitron', sans-serif; font-size: 1.15rem; text-transform: uppercase; }
+
+        .game-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tab-btn { background: rgba(10, 15, 26, 0.8); border: 1px solid var(--card-border); color: var(--text-muted); padding: 0.6rem 1rem; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active, .tab-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0, 229, 255, 0.05); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+        th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--card-border); font-size: 1rem; }
+        th { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }
+        tr:hover { background: rgba(255, 255, 255, 0.02); }
+        
+        .rank-1 { color: #ffd700; font-weight: 900; }
+        .rank-2 { color: #c0c0c0; font-weight: 900; }
+        .rank-3 { color: #cd7f32; font-weight: 900; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">🏆 GAME LEADERBOARDS</div>
+        <a href="/" style="color: var(--neon-cyan); text-decoration: none; font-weight: 700;">← Back to Arena</a>
+    </header>
+
+    <div class="card">
+        <h2>Select Game Title</h2>
+        <div class="game-tabs">
+            <button class="tab-btn active" onclick="loadLeaderboard(1, this)">eFootball</button>
+            <button class="tab-btn" onclick="loadLeaderboard(2, this)">PUBG Mobile</button>
+            <button class="tab-btn" onclick="loadLeaderboard(3, this)">Call of Duty: Mobile</button>
+            <button class="tab-btn" onclick="loadLeaderboard(4, this)">Free Fire</button>
+            <button class="tab-btn" onclick="loadLeaderboard(5, this)">Mortal Kombat</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 id="leaderboardTitle">Rankings</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Matches</th>
+                    <th>Wins</th>
+                    <th>Total Earnings</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardTableBody">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading rankings...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const socket = io();
+    let currentGameId = 1;
+
+    async function loadLeaderboard(gameId, buttonElement) {
+        currentGameId = gameId;
+        if (buttonElement) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            buttonElement.classList.add('active');
+        }
+
+        const res = await fetch(`/api/leaderboard/${gameId}`);
+        const data = await res.json();
+        const tbody = document.getElementById('leaderboardTableBody');
+
+        if (!data.success || data.rankings.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">No completed match rankings for this game yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = '';
+        data.rankings.forEach(row => {
+            const rankClass = row.rank_position == 1 ? 'rank-1' : row.rank_position == 2 ? 'rank-2' : row.rank_position == 3 ? 'rank-3' : '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="${rankClass}">#${row.rank_position}</td>
+                <td><b>${row.email}</b></td>
+                <td>${row.matches_played}</td>
+                <td style="color: var(--neon-green);">${row.wins}</td>
+                <td style="font-family: 'Orbitron', sans-serif; color: var(--neon-cyan);">${parseFloat(row.total_earned).toFixed(2)} KES</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Real-time listener for leaderboard updates
+    socket.on('leaderboard_update', (data) => {
+        if (data.gameId === currentGameId) {
+            loadLeaderboard(currentGameId);
+        }
+    });
+
+    // Load default game on startup
+    loadLeaderboard(1);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kenya Esports - Global Gaming & Entertainment Hub</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
+    * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
+    body { 
+      background: #0b0f19; 
+      color: #f3f4f6; 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+    }
+    
+    /* Top Header Bar */
+    header {
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 14px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .btn-gold:hover { filter: brightness(1.2); }
+
+    .section-box {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    input[type="number"], input[type="text"] {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 100%;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Tables */
+    .arena-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .arena-table th {
+      background: #1f2937;
+      color: #f59e0b;
+      padding: 10px;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .arena-table td {
+      padding: 10px;
+      border-bottom: 1px solid #1f2937;
+      color: #cbd5e1;
+    }
+
+    /* Bracket UI Styles */
+    .bracket-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 14px 0;
+    }
+    .bracket-round {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      min-width: 180px;
+    }
+    .bracket-match {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 8px;
+      margin: 8px 0;
+      font-size: 11px;
+    }
+    .bracket-match.active-user {
+      border: 2px solid #f59e0b;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+    }
+    .bracket-player {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+    .bracket-player.winner {
+      background: #064e3b;
+      color: #34d399;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="background:#f59e0b; color:#000; padding:6px 10px; border-radius:8px; font-weight:900; font-size:14px;">🛡️</span>
+      <h2 style="color: #fff; margin:0; font-size: 18px; letter-spacing:0.5px;">KENYA ESPORTS</h2>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <!-- Wallet Badge -->
+      <span id="user-balance" onclick="openWalletModal()" style="font-weight: bold; color: #10b981; background: #064e3b; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; border: 1px solid #10b981;">Wallet: 4,500 KES</span>
+      
+      <!-- Account Profile Button -->
+      <button id="auth-btn" onclick="openAuthModal()" class="btn-gold" style="display:flex; align-items:center; gap:6px;">
+        <img id="nav-profile-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width:20px; height:20px; border-radius:50%; object-fit:cover;" />
+        <span id="nav-username">👤 Account</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Account Profile Modal Overlay -->
+  <div id="auth-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#111827; border:2px solid #f59e0b; border-radius:16px; padding:24px; width:350px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5); max-height:90vh; overflow-y:auto;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 id="auth-modal-title" style="color:#f59e0b; margin:0;">Player Profile</h3>
+        <button onclick="closeAuthModal()" style="background:none; border:none; color:#9ca3af; font-size:16px; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="position:relative; display:inline-block;">
+          <img id="profile-preview-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" style="width:70px; height:70px; border-radius:50%; border:2px solid #f59e0b; object-fit:cover;" />
+          <label for="profile-pic-input" style="position:absolute; bottom:0; right:0; background:#f59e0b; color:#000; border-radius:50%; padding:4px 6px; font-size:10px; cursor:pointer; font-weight:bold;" title="Change Profile Picture">📷</label>
+        </div>
+        <input id="profile-pic-input" type="file" accept="image/*" onchange="previewProfilePic(event)" style="display:none;" />
+      </div>
+
+      <div id="auth-form-container">
+        <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Email Address</label>
+        <input id="auth-email" type="email" placeholder="gamer@example.com" value="omondi@kenyaesports.co.ke" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
+
+        <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Gamer Username</label>
+        <input id="auth-username" type="text" placeholder="e.g. Omondi_KE" value="Omondi_KE" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
+
+        <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">M-Pesa Phone Number</label>
+        <input id="auth-phone" type="text" placeholder="2547XXXXXXXX" value="254712345678" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
+
+        <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Referral Code (Optional)</label>
+        <input id="auth-referral" type="text" placeholder="e.g. ARENA254" value="KE-ESPORTS-88" style="width:100%; padding:10px; margin-bottom:14px; background:#1f2937; border:1px solid #374151; color:#f59e0b; font-weight:bold; border-radius:8px; font-size:12px;" />
+
+        <button onclick="saveProfileChanges()" class="btn-gold" style="width:100%; padding:10px; margin-bottom:10px;">SAVE PROFILE CHANGES</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Modal (Deposit & Withdraw via M-Pesa with Manual Verification Support) -->
+  <div id="wallet-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#111827; border:2px solid #10b981; border-radius:16px; padding:24px; width:360px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="color:#10b981; margin:0;">💰 M-Pesa Wallet</h3>
+        <button onclick="closeWalletModal()" style="background:none; border:none; color:#9ca3af; font-size:16px; cursor:pointer;">✕</button>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:16px;">
+        <button id="tab-deposit-btn" onclick="switchWalletTab('deposit')" style="flex:1; padding:8px; font-weight:bold; font-size:11px; background:#10b981; color:#000; border:none; border-radius:6px; cursor:pointer;">DEPOSIT</button>
+        <button id="tab-withdraw-btn" onclick="switchWalletTab('withdraw')" style="flex:1; padding:8px; font-weight:bold; font-size:11px; background:#1f2937; color:#fff; border:1px solid #374151; border-radius:6px; cursor:pointer;">WITHDRAW</button>
+      </div>
+
+      <div id="wallet-deposit-view">
+        <p style="font-size:11px; color:#9ca3af; margin:0 0 10px 0;">Lipa Na M-Pesa Till: <strong style="color:#f59e0b;">5492810</strong> (Kenya Esports). Enter code below:</p>
+        <input id="deposit-amount" type="number" placeholder="Amount (KES)" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
+        <input id="deposit-mpesa-code" type="text" placeholder="M-Pesa Code (e.g. QHG82J9X1K)" style="width:100%; padding:10px; margin-bottom:14px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px; text-transform:uppercase;" />
+        <button onclick="processManualDeposit()" class="btn-gold" style="width:100%; padding:10px; background:#10b981; color:#000;">VERIFY & CREDIT DEPOSIT</button>
+      </div>
+
+      <div id="wallet-withdraw-view" style="display:none;">
+        <p style="font-size:11px; color:#9ca3af; margin:0 0 10px 0;">Instant payout directly to your M-Pesa number.</p>
+        <input id="withdraw-phone" type="text" placeholder="M-Pesa Phone (2547XXXXXXXX)" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
+        <input id="withdraw-amount" type="number" placeholder="Amount (KES)" style="width:100%; padding:10px; margin-bottom:14px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
+        <button onclick="processWithdraw()" class="btn-gold" style="width:100%; padding:10px; background:#f59e0b; color:#000;">WITHDRAW TO M-PESA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW 1: HOME DASHBOARD -->
+  <div id="home-view">
+    <!-- 1. UPCOMING TOURNAMENTS & EVENTS BANNER -->
+    <div id="events-container" class="section-box" style="border-left: 4px solid #f59e0b;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="color:#f59e0b; margin:0; font-size:15px; font-weight:700; text-transform:uppercase;">📢 Featured Tournaments & Events</h3>
+      </div>
+      <div id="upcoming-events-container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px;"></div>
+    </div>
+
+    <!-- 2. LIVE SPECTATOR ARENA -->
+    <div id="stream-container" class="section-box">
+      <h3 style="color:#fff; margin-top:0; font-size:15px; font-weight:700; text-transform:uppercase;">Live Spectator Arena</h3>
+      <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 16px; align-items: stretch;">
+        <div style="background: #000; height: 260px; border-radius: 10px; display:flex; flex-direction:column; justify-content:space-between; padding:12px; border: 1px solid #1f2937; position:relative; overflow:hidden;">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:#fff; font-weight:bold;">
+            <span style="background:rgba(239,68,68,0.8); padding:2px 6px; border-radius:4px;">LIVE</span>
+            <span style="background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px;">0:29</span>
+          </div>
+          <div style="text-align:center; color:#9ca3af; font-size:13px;">[ eFootball 2026 Championship Match Stream ]</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#9ca3af;">
+            <span>▶ Play</span>
+            <span>🔊 4D ⛶</span>
+          </div>
+        </div>
+
+        <div style="background: #1f2937; border-radius: 10px; padding: 12px; display:flex; flex-direction:column; justify-content:space-between; height: 260px; border: 1px solid #374151;">
+          <div style="font-size:12px; font-weight:bold; color:#fff; border-bottom:1px solid #374151; padding-bottom:6px; margin-bottom:6px; display:flex; justify-content:space-between;">
+            <span>Live Chat</span>
+            <span>⌄</span>
+          </div>
+          <div id="chat-box" style="overflow-y: auto; font-size: 11px; flex-grow: 1; padding-right: 4px; display:flex; flex-direction:column; gap:4px;">
+            <p style="margin:0; color:#9ca3af;"><strong style="color:#f59e0b;">@Kev_254:</strong> Omondi is unstoppable!</p>
+            <p style="margin:0; color:#9ca3af;"><strong style="color:#38bdf8;">@Sarah:</strong> Great tournament lineup today!</p>
+          </div>
+          <div style="display:flex; gap:6px; margin-top:8px;">
+            <input id="chat-input" type="text" placeholder="Type a message..." style="width:100%; border:none; border-radius:6px; padding:8px; background:#111827; color:#fff; font-size:11px;" />
+            <button onclick="sendChatMessage()" class="btn-gold" style="padding: 8px 12px;">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. GAME CATALOG & ARENAS -->
+    <div class="section-box">
+      <h3 style="color: #fff; font-size:15px; font-weight: 700; text-transform:uppercase; margin: 0 0 16px 0;">Game Catalog & Arenas</h3>
+      <div id="games-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px;"></div>
+    </div>
+  </div>
+
+  <!-- VIEW 2: eFOOTBALL ARENA VIEW -->
+  <div id="efootball-view" style="display: none; max-width: 1050px; margin: 0 auto;">
+    <div class="section-box" style="border: 2px solid #10b981;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button onclick="switchView('home')" style="background:#1f2937; border:1px solid #374151; color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold;">⬅ BACK</button>
+          <h3 style="color:#10b981; margin:0; font-size:16px; font-weight:800; text-transform:uppercase;">⚽ eFOOTBALL CHAMPIONSHIP ARENA</h3>
+        </div>
+        <span style="font-size:11px; color:#10b981; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:6px; font-weight:bold;">TOURNAMENT TIERS</span>
+      </div>
+
+      <!-- ACTIVE MATCH LOBBY & ROOM CODE EXCHANGE BOX -->
+      <div id="active-match-lobby" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 2px solid #f59e0b; border-radius: 14px; padding: 18px; margin-bottom: 24px; color: #fff;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="background:#f59e0b; color:#000; font-size:10px; font-weight:900; padding:2px 8px; border-radius:4px;">YOUR ACTIVE MATCH LOBBY</span>
+          <span style="font-size:11px; color:#38bdf8; font-weight:bold;">Status: <span id="match-status-label" style="color:#10b981;">ROOM CODE NEEDED</span></span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+          <div>
+            <h3 style="margin:0; font-size:18px; color:#fff;" id="match-players-title">🎮 @Omondi_KE (You) vs @Kev_254</h3>
+            <p style="margin:4px 0 0 0; font-size:11px; color:#9ca3af;">Tournament Tier: <strong style="color:#f59e0b;">Players Pool (30 Bob)</strong> | Prize Pool: <strong style="color:#10b981;">300 KES</strong></p>
+          </div>
+          <div style="background:#111827; border:1px solid #374151; padding:8px 12px; border-radius:8px; text-align:center;">
+            <div style="font-size:10px; color:#9ca3af;">Assigned Host</div>
+            <div style="font-size:12px; font-weight:bold; color:#f59e0b;" id="assigned-host-label">@Omondi_KE (You)</div>
+          </div>
+        </div>
+
+        <!-- Room Code Exchange & Screenshot Box -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:14px; background:#0b0f19; padding:14px; border-radius:10px; border:1px solid #1f2937;">
+          <div>
+            <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:6px;">Host Action: Enter eFootball Room Code</label>
+            <div style="display:flex; gap:6px;">
+              <input id="room-code-input" type="text" placeholder="e.g. 849204" style="font-size:14px; padding:8px; border:1px solid #f59e0b;" />
+              <button onclick="submitRoomCode()" class="btn-gold" style="white-space:nowrap;">SUBMIT CODE</button>
+            </div>
+            <span style="font-size:10px; color:#64748b; display:block; margin-top:4px;">Open eFootball app ➔ Match Room ➔ Copy Code & Submit.</span>
+          </div>
+
+          <div style="border-left:1px solid #1f2937; padding-left:14px;">
+            <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:6px;">Guest Action: Copy Room Code & Join</label>
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#111827; border:1px dashed #10b981; padding:8px 12px; border-radius:8px;">
+              <span id="active-room-code-display" style="font-size:16px; font-weight:900; color:#10b981; letter-spacing:2px;">------</span>
+              <button onclick="copyRoomCode()" class="btn-gold" style="background:#10b981; color:#000; padding:6px 10px;">COPY CODE</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RESULT REPORTING & SCREENSHOT VERIFIER BOX -->
+        <div style="margin-top:16px; background:#0b0f19; padding:14px; border-radius:10px; border:1px solid #1f2937;">
+          <h4 style="margin:0 0 8px 0; color:#f59e0b; font-size:12px; text-transform:uppercase;">📸 Report Match Result & Upload Screenshot</h4>
+          <p style="margin:0 0 10px 0; font-size:11px; color:#9ca3af;">When your eFootball match finishes, upload a score screenshot and select your result.</p>
+          
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <input id="screenshot-upload" type="file" accept="image/*" style="font-size:11px; max-width:220px;" />
+            <button onclick="reportMatchResult('WON')" class="btn-gold" style="background:#10b981; color:#fff;">I WON 🏆</button>
+            <button onclick="reportMatchResult('LOST')" class="btn-gold" style="background:#ef4444; color:#fff;">I LOST ❌</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE TOURNAMENT BRACKET TREE -->
+      <div style="margin-bottom: 24px;">
+        <h4 style="color: #f59e0b; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">🌳 Interactive Tournament Bracket</h4>
+        <div class="bracket-container" id="tournament-bracket-tree"></div>
+      </div>
+
+      <!-- 4 Entry Tiers Grid -->
+      <h4 style="color: #f59e0b; margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase;">🎮 Choose Your Tournament Tier</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px;">
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <span style="background:#3b82f6; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">ENTRY 1</span>
+            <h5 style="color:#fff; font-size:15px; margin:8px 0 4px 0;">1v1 Direct Match</h5>
+            <p style="color:#9ca3af; font-size:11px; margin:0 0 12px 0;">Fast head-to-head showdown.</p>
+            <div style="font-size:12px; color:#10b981; font-weight:bold; margin-bottom:4px;">Entry Fee: 30 KES</div>
+            <div style="font-size:13px; color:#f59e0b; font-weight:800; margin-bottom:14px;">Win Payout: 50 KES</div>
+          </div>
+          <button onclick="joinEfootballTier('1v1 Direct Match', 30, 50)" class="btn-gold" style="background:#3b82f6; color:#fff; width:100%; padding:10px 0;">
+            JOIN 30 KES TIER
+          </button>
+        </div>
+
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <span style="background:#10b981; color:#000; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">ENTRY 2</span>
+            <h5 style="color:#fff; font-size:15px; margin:8px 0 4px 0;">Players Pool</h5>
+            <p style="color:#9ca3af; font-size:11px; margin:0 0 12px 0;">Standard bracket tournament.</p>
+            <div style="font-size:12px; color:#10b981; font-weight:bold; margin-bottom:4px;">Entry Fee: 30 KES</div>
+            <div style="font-size:13px; color:#f59e0b; font-weight:800; margin-bottom:14px;">Win Payout: 300 KES</div>
+          </div>
+          <button onclick="joinEfootballTier('Players Pool (30 Bob)', 30, 300)" class="btn-gold" style="background:#10b981; color:#000; width:100%; padding:10px 0;">
+            JOIN 30 KES TIER
+          </button>
+        </div>
+
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <span style="background:#f59e0b; color:#000; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">ENTRY 3</span>
+            <h5 style="color:#fff; font-size:15px; margin:8px 0 4px 0;">Players Pool</h5>
+            <p style="color:#9ca3af; font-size:11px; margin:0 0 12px 0;">Advanced bracket tournament.</p>
+            <div style="font-size:12px; color:#10b981; font-weight:bold; margin-bottom:4px;">Entry Fee: 50 KES</div>
+            <div style="font-size:13px; color:#f59e0b; font-weight:800; margin-bottom:14px;">Win Payout: 500 KES</div>
+          </div>
+          <button onclick="joinEfootballTier('Players Pool (50 Bob)', 50, 500)" class="btn-gold" style="background:#f59e0b; color:#000; width:100%; padding:10px 0;">
+            JOIN 50 KES TIER
+          </button>
+        </div>
+
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <span style="background:#ef4444; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">ENTRY 4</span>
+            <h5 style="color:#fff; font-size:15px; margin:8px 0 4px 0;">Pro Pool</h5>
+            <p style="color:#9ca3af; font-size:11px; margin:0 0 12px 0;">High stakes championship.</p>
+            <div style="font-size:12px; color:#10b981; font-weight:bold; margin-bottom:4px;">Entry Fee: 100 KES</div>
+            <div style="font-size:13px; color:#f59e0b; font-weight:800; margin-bottom:14px;">Win Payout: 1,000 KES</div>
+          </div>
+          <button onclick="joinEfootballTier('Pro Pool (100 Bob)', 100, 1000)" class="btn-gold" style="background:#ef4444; color:#fff; width:100%; padding:10px 0;">
+            JOIN 100 KES TIER
+          </button>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div>
+        <h4 style="color: #f59e0b; margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase;">🏅 Arena Leaderboard & Standings</h4>
+        <div style="overflow-x: auto;">
+          <table class="arena-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player Handle</th>
+                <th>Wins / Losses</th>
+                <th>Earnings (KES)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="color:#f59e0b; font-weight:bold;">#1</td>
+                <td><strong>Omondi_KE</strong></td>
+                <td>42 / 3</td>
+                <td style="color:#10b981; font-weight:bold;">24,500 KES</td>
+              </tr>
+              <tr>
+                <td style="color:#9ca3af; font-weight:bold;">#2</td>
+                <td><strong>Kev_254</strong></td>
+                <td>38 / 6</td>
+                <td style="color:#10b981; font-weight:bold;">18,200 KES</td>
+              </tr>
+              <tr>
+                <td style="color:#9ca3af; font-weight:bold;">#3</td>
+                <td><strong>Sarah_KE</strong></td>
+                <td>31 / 9</td>
+                <td style="color:#10b981; font-weight:bold;">12,900 KES</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Legal Links -->
+  <footer style="text-align:center; padding: 20px; font-size: 11px; color: #6b7280; border-top: 1px solid #1f2937; margin-top: 40px;">
+    <p>&copy; 2026 Kenya Esports. All rights reserved.</p>
+    <p>
+      <a href="terms.html" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Terms & Conditions</a> | 
+      <a href="privacy.html" style="color: #9ca3af; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
+    </p>
+  </footer>
+
+  <!-- Script Imports -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Controller Script -->
+  <script>
+    let socket;
+    let userCurrentBalance = 4500;
+
+    let userProfile = {
+      username: 'Omondi_KE',
+      email: 'omondi@kenyaesports.co.ke',
+      phone: '254712345678',
+      referral: 'KE-ESPORTS-88',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'
+    };
+
+    const GAMES_CATALOG = [
+      { 
+        id: 'sports-tipster', 
+        title: 'SPORTS TIPSTER', 
+        btnText: 'ENTER LOBBY', 
+        img: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80', 
+        link: 'sports-tipster.html',
+        isChampionsBanner: true 
+      },
+      { 
+        id: 'cod-mobile', 
+        title: 'COD MOBILE', 
+        btnText: 'PLAY LIVE', 
+        img: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80', 
+        link: 'cod.html' 
+      },
+      { 
+        id: 'pubg-mobile', 
+        title: 'PUBG MOBILE', 
+        btnText: 'PLAY / ENTER', 
+        img: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=400&auto=format&fit=crop&q=80', 
+        link: 'pubg.html' 
+      },
+      { 
+        id: 'efootball', 
+        title: 'eFOOTBALL', 
+        btnText: 'ENTER LOBBY', 
+        img: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&auto=format&fit=crop&q=80' 
+      }
+    ];
+
+    let activeTournaments = JSON.parse(localStorage.getItem('admin_tournaments') || 'null') || [
+      { 
+        id: 'EV-101', 
+        title: '3-Day eFootball Championship', 
+        game: 'eFootball 2026', 
+        type: '1v1',
+        matchTime: 'Fri 14th Nov @ 8:00 PM',
+        regDeadline: 'Fri 14th Nov @ 6:00 PM',
+        img: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&auto=format&fit=crop&q=80', 
+        entry: 50, 
+        prize: 5000, 
+        registeredPlayers: ['Omondi_KE', 'Kev_254', 'Sarah_KE'], 
+        status: 'REGISTRATION_OPEN',
+        roomDetails: { roomId: '------', password: '------' }
+      }
+    ];
+
+    let currentActiveMatch = {
+      matchId: 'MATCH-9921',
+      host: 'Omondi_KE',
+      guest: 'Kev_254',
+      tier: 'Players Pool (30 Bob)',
+      prize: 300,
+      roomCode: null,
+      status: 'ROOM CODE NEEDED'
+    };
+
+    let bracketTreeData = [
+      [
+        { p1: 'Omondi_KE', p2: 'Kev_254', winner: 'Omondi_KE', active: true },
+        { p1: 'Sarah_KE', p2: 'Brian_Bet', winner: 'Sarah_KE' },
+        { p1: 'Maina_001', p2: 'Njeri_Pro', winner: 'Maina_001' },
+        { p1: 'Barack_99', p2: 'Mercy_W', winner: 'Barack_99' }
+      ],
+      [
+        { p1: 'Omondi_KE', p2: 'Sarah_KE', winner: 'Omondi_KE', active: true },
+        { p1: 'Maina_001', p2: 'Barack_99', winner: null }
+      ],
+      [
+        { p1: 'Omondi_KE', p2: 'TBD', winner: null }
+      ]
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      checkUserSession();
+      renderTournaments();
+      renderGameCatalog();
+      renderBracketTree();
+
+      if (typeof io !== 'undefined') {
+        socket = io();
+        socket.on('receive_chat_message', (data) => {
+          const chatBox = document.getElementById('chat-box');
+          if (chatBox) {
+            const msg = document.createElement('p');
+            msg.style.margin = '0';
+            msg.innerHTML = `<strong style="color:#f59e0b;">${data.username}:</strong> ${data.message}`;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }
+        });
+      }
+    });
+
+    function switchView(viewName) {
+      const homeView = document.getElementById('home-view');
+      const efootballView = document.getElementById('efootball-view');
+
+      homeView.style.display = 'none';
+      efootballView.style.display = 'none';
+
+      if (viewName === 'efootball') {
+        efootballView.style.display = 'block';
+      } else {
+        homeView.style.display = 'block';
+      }
+    }
+
+    function renderTournaments() {
+      const container = document.getElementById('upcoming-events-container');
+      if (!container) return;
+
+      const stored = localStorage.getItem('admin_tournaments');
+      if (stored) {
+        try { activeTournaments = JSON.parse(stored); } catch(e){}
+      }
+
+      container.innerHTML = activeTournaments.map(t => {
+        const isRegistered = t.registeredPlayers.includes(userProfile.username);
+        const isClosed = t.status === 'REGISTRATION_CLOSED';
+        
+        let buttonHTML = '';
+        if (isRegistered) {
+          buttonHTML = `<button onclick="openEventLobby('${t.id}')" class="btn-gold" style="background:#064e3b; color:#34d399; width:100%; margin-top:10px; padding:8px 0; font-size:11px;">
+            ✅ REGISTERED (OPEN MATCH LOBBY)
+          </button>`;
+        } else if (isClosed) {
+          buttonHTML = `<button disabled style="background:#374151; color:#ef4444; width:100%; margin-top:10px; padding:8px 0; font-size:11px; border:none; border-radius:6px; font-weight:bold;">
+            🔒 REGISTRATION CLOSED
+          </button>`;
+        } else {
+          buttonHTML = `<button onclick="joinTournament('${t.id}')" class="btn-gold" style="width:100%; margin-top:10px; padding:8px 0; font-size:11px;">
+            JOIN NOW (${t.entry} KES)
+          </button>`;
+        }
+
+        return `
+          <div style="background:#1f2937; border-radius:10px; overflow:hidden; border:1px solid #374151; display:flex; flex-direction:column; justify-content:space-between;">
+            <img src="${t.img}" alt="${t.title}" style="width:100%; height:125px; object-fit:cover;" />
+            <div style="padding:12px; display:flex; flex-direction:column; flex-grow:1; justify-content:space-between;">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                  <h4 style="margin:0; color:#fff; font-size:13px;">${t.title}</h4>
+                  <span style="background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid #f59e0b; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:bold;">⏳ CLOSES: ${t.regDeadline}</span>
+                </div>
+                <div style="font-size:11px; color:#9ca3af;">Game: <strong style="color:#38bdf8;">${t.game}</strong></div>
+                <div style="font-size:12px; color:#10b981; font-weight:bold; margin:4px 0;">Prize Pool: ${t.prize.toLocaleString()} KES</div>
+                <div style="font-size:10px; color:#9ca3af; margin-top:4px;">🕒 Kickoff: <strong style="color:#fff;">${t.matchTime}</strong></div>
+                <div style="font-size:10px; color:#38bdf8; margin-top:2px;">👥 Enrolled: <strong>${t.registeredPlayers.length} Players</strong></div>
+              </div>
+              ${buttonHTML}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderGameCatalog() {
+      const container = document.getElementById('games-grid-container');
+      if (!container) return;
+
+      container.innerHTML = GAMES_CATALOG.map(g => {
+        let mediaContent = `<img src="${g.img}" alt="${g.title}" style="width:100%; height:130px; object-fit:cover;" />`;
+        if (g.isChampionsBanner) {
+          mediaContent = `
+            <div style="width:100%; height:130px; background:radial-gradient(circle, #1e293b 0%, #0f172a 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; border-bottom:2px solid #f59e0b;">
+              <div style="position:absolute; font-size:22px; font-weight:900; letter-spacing:3px; color:#f59e0b; text-shadow:0 0 12px rgba(245,158,11,0.6); text-transform:uppercase;">CHAMPIONS</div>
+            </div>
+          `;
+        }
+
+        return `
+          <div style="background:#1f2937; border:1px solid #374151; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;">
+            ${mediaContent}
+            <div style="padding:12px; display:flex; flex-direction:column; flex-grow:1; justify-content:space-between;">
+              <h4 style="color:#fff; font-size:13px; margin:0 0 8px 0; text-align:center;">${g.title}</h4>
+              <button onclick="handleGameClick('${g.id}', '${g.link || ''}')" class="btn-gold" style="width:100%; padding:8px 0; font-size:10px;">
+                ${g.btnText}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleGameClick(gameId, link) {
+      if (gameId === 'efootball') {
+        switchView('efootball');
+      } else if (link) {
+        window.location.href = link;
+      } else {
+        alert(`Launching ${gameId} arena...`);
+      }
+    }
+
+    function joinTournament(eventId) {
+      const tourney = activeTournaments.find(t => t.id === eventId);
+      if (!tourney) return;
+
+      if (userCurrentBalance < tourney.entry) {
+        alert(`❌ Insufficient wallet balance! You need ${tourney.entry} KES. Please deposit funds.`);
+        openWalletModal();
+        return;
+      }
+
+      userCurrentBalance -= tourney.entry;
+      updateWalletDisplay();
+      recordTransaction('TOURNAMENT_ENTRY', -tourney.entry, `Entry for ${tourney.title}`);
+
+      tourney.registeredPlayers.push(userProfile.username);
+      localStorage.setItem('admin_tournaments', JSON.stringify(activeTournaments));
+
+      renderTournaments();
+      alert(`✅ Successfully registered for ${tourney.title}! ${tourney.entry} KES deducted.`);
+    }
+
+    function openEventLobby(eventId) {
+      switchView('efootball');
+    }
+
+    function joinEfootballTier(tierName, entryFee, prizeAmount) {
+      if (userCurrentBalance < entryFee) {
+        alert(`❌ Insufficient balance! You need ${entryFee} KES.`);
+        openWalletModal();
+        return;
+      }
+
+      userCurrentBalance -= entryFee;
+      updateWalletDisplay();
+      recordTransaction('TOURNAMENT_ENTRY', -entryFee, `Joined ${tierName}`);
+
+      currentActiveMatch.tier = tierName;
+      currentActiveMatch.prize = prizeAmount;
+      currentActiveMatch.status = 'ROOM CODE NEEDED';
+
+      document.getElementById('match-players-title').innerText = `🎮 @${userProfile.username} (You) vs @Kev_254`;
+      document.getElementById('match-status-label').innerText = 'ROOM CODE NEEDED';
+      document.getElementById('match-status-label').style.color = '#10b981';
+
+      alert(`✅ Successfully joined ${tierName}! -${entryFee} KES deducted. Match lobby initialized.`);
+    }
+
+    function submitRoomCode() {
+      const code = document.getElementById('room-code-input').value.trim();
+      if (!code) return alert('⚠️ Please enter a valid eFootball room code.');
+
+      currentActiveMatch.roomCode = code;
+      currentActiveMatch.status = 'MATCH IN PROGRESS';
+
+      document.getElementById('active-room-code-display').innerText = code;
+      document.getElementById('match-status-label').innerText = 'MATCH IN PROGRESS';
+      document.getElementById('match-status-label').style.color = '#f59e0b';
+
+      alert(`📡 Room Code [${code}] submitted and broadcasted to guest successfully!`);
+    }
+
+    function copyRoomCode() {
+      const code = document.getElementById('active-room-code-display').innerText;
+      if (code === '------') return alert('⚠️ No room code submitted by host yet.');
+
+      navigator.clipboard.writeText(code);
+      alert(`📋 Room Code [${code}] copied to clipboard! Open eFootball app and join.`);
+    }
+
+    function reportMatchResult(result) {
+      const fileInput = document.getElementById('screenshot-upload');
+      if (fileInput.files.length === 0) {
+        return alert('⚠️ Please upload a screenshot of your match result before submitting.');
+      }
+
+      if (result === 'WON') {
+        const reward = currentActiveMatch.prize;
+        userCurrentBalance += reward;
+        updateWalletDisplay();
+        recordTransaction('TOURNAMENT_PRIZE', reward, `Won ${currentActiveMatch.tier}`);
+
+        document.getElementById('match-status-label').innerText = 'VICTORY 🏆 (+ ' + reward + ' KES)';
+        document.getElementById('match-status-label').style.color = '#10b981';
+        alert(`🎉 Victory verified! +${reward} KES added to your M-Pesa wallet.`);
+      } else {
+        document.getElementById('match-status-label').innerText = 'MATCH LOST ❌';
+        document.getElementById('match-status-label').style.color = '#ef4444';
+        alert(`❌ Result reported as Defeat. Good luck in the next round!`);
+      }
+    }
+
+    function renderBracketTree() {
+      const container = document.getElementById('tournament-bracket-tree');
+      if (!container) return;
+
+      container.innerHTML = bracketTreeData.map((round, rIdx) => `
+        <div class="bracket-round">
+          <div style="font-size:10px; color:#f59e0b; font-weight:bold; margin-bottom:6px; text-transform:uppercase;">Round ${rIdx + 1}</div>
+          ${round.map(m => `
+            <div class="bracket-match ${m.active ? 'active-user' : ''}">
+              <div class="bracket-player ${m.winner === m.p1 ? 'winner' : ''}">
+                <span>${m.p1}</span>
+              </div>
+              <div style="border-top:1px solid #374151; margin:2px 0;"></div>
+              <div class="bracket-player ${m.winner === m.p2 ? 'winner' : ''}">
+                <span>${m.p2}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    // Modal & Wallet Functions
+    function openAuthModal() { document.getElementById('auth-modal').style.display = 'flex'; }
+    function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+    
+    function openWalletModal() { document.getElementById('wallet-modal').style.display = 'flex'; }
+    function closeWalletModal() { document.getElementById('wallet-modal').style.display = 'none'; }
+
+    function switchWalletTab(tab) {
+      const depView = document.getElementById('wallet-deposit-view');
+      const wdrView = document.getElementById('wallet-withdraw-view');
+      const depBtn = document.getElementById('tab-deposit-btn');
+      const wdrBtn = document.getElementById('tab-withdraw-btn');
+
+      if (tab === 'deposit') {
+        depView.style.display = 'block';
+        wdrView.style.display = 'none';
+        depBtn.style.background = '#10b981'; depBtn.style.color = '#000';
+        wdrBtn.style.background = '#1f2937'; wdrBtn.style.color = '#fff';
+      } else {
+        depView.style.display = 'none';
+        wdrView.style.display = 'block';
+        wdrBtn.style.background = '#f59e0b'; wdrBtn.style.color = '#000';
+        depBtn.style.background = '#1f2937'; depBtn.style.color = '#fff';
+      }
+    }
+
+    function processManualDeposit() {
+      const amount = parseFloat(document.getElementById('deposit-amount').value);
+      const mpesaCode = document.getElementById('deposit-mpesa-code').value.trim().toUpperCase();
+
+      if (isNaN(amount) || amount <= 0 || !mpesaCode) {
+        return alert('⚠️ Please enter a valid deposit amount and your M-Pesa confirmation code.');
+      }
+
+      userCurrentBalance += amount;
+      updateWalletDisplay();
+      recordTransaction('MANUAL_DEPOSIT', amount, `M-Pesa Code: ${mpesaCode}`);
+      closeWalletModal();
+      alert(`✅ M-Pesa Code [${mpesaCode}] verified successfully! +${amount.toLocaleString()} KES added to your wallet.`);
+    }
+
+    function processWithdraw() {
+      const phone = document.getElementById('withdraw-phone').value.trim();
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
+
+      if (!phone || isNaN(amount) || amount <= 0) {
+        return alert('⚠️ Please enter a valid phone number and withdrawal amount.');
+      }
+
+      if (amount > userCurrentBalance) {
+        return alert('❌ Insufficient wallet balance for this withdrawal.');
+      }
+
+      userCurrentBalance -= amount;
+      updateWalletDisplay();
+      recordTransaction('WITHDRAWAL', -amount, `M-Pesa Payout to ${phone}`);
+      closeWalletModal();
+      alert(`✅ Withdrawal request submitted! -${amount.toLocaleString()} KES will be sent to ${phone}.`);
+    }
+
+    function updateWalletDisplay() {
+      document.getElementById('user-balance').innerText = `Wallet: ${userCurrentBalance.toLocaleString()} KES`;
+    }
+
+    function recordTransaction(type, amount, description) {
+      let txs = JSON.parse(localStorage.getItem('admin_transactions') || '[]');
+      txs.unshift({
+        type: type,
+        username: userProfile.username,
+        phone: userProfile.phone,
+        amount: amount,
+        desc: description,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString()
+      });
+      localStorage.setItem('admin_transactions', JSON.stringify(txs));
+    }
+
+    function saveProfileChanges() {
+      userProfile.email = document.getElementById('auth-email').value;
+      userProfile.username = document.getElementById('auth-username').value;
+      userProfile.phone = document.getElementById('auth-phone').value;
+      userProfile.referral = document.getElementById('auth-referral').value;
+
+      document.getElementById('nav-username').innerText = userProfile.username;
+      closeAuthModal();
+      alert('✅ Player profile updated successfully!');
+    }
+
+    function previewProfilePic(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          userProfile.avatar = e.target.result;
+          document.getElementById('profile-preview-img').src = e.target.result;
+          document.getElementById('nav-profile-avatar').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const chatBox = document.getElementById('chat-box');
+      const p = document.createElement('p');
+      p.style.margin = '0';
+      p.innerHTML = `<strong style="color:#f59e0b;">@${userProfile.username}:</strong> ${msg}`;
+      chatBox.appendChild(p);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      if (socket) {
+        socket.emit('send_chat_message', { username: userProfile.username, message: msg });
+      }
+
+      input.value = '';
+    }
+
+    function checkUserSession() {
+      document.getElementById('nav-username').innerText = userProfile.username;
+      updateWalletDisplay();
+    }
+  </script>
+</body>
+</html>

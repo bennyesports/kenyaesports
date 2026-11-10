@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kenya Esports - PUBG Mobile Arena</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
+    * { box-sizing: border-box; transition: all 0.2s ease-in-out; }
+    body { 
+      background: #0b0f19; 
+      color: #f3f4f6; 
+      font-family: 'Inter', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+    }
+    
+    header {
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 14px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .btn-gold:hover { filter: brightness(1.2); }
+
+    .section-box {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .pubg-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .pubg-table th {
+      background: #1f2937;
+      color: #f59e0b;
+      padding: 10px;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .pubg-table td {
+      padding: 10px;
+      border-bottom: 1px solid #1f2937;
+      color: #cbd5e1;
+    }
+
+    .tab-btn {
+      background: #1f2937;
+      color: #9ca3af;
+      border: 1px solid #374151;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: #f59e0b;
+      color: #000;
+      border-color: #f59e0b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="background:#f59e0b; color:#000; padding:6px 10px; border-radius:8px; font-weight:900; font-size:14px;">🪂</span>
+      <h2 style="color: #fff; margin:0; font-size: 18px; letter-spacing:0.5px;">KENYA ESPORTS : PUBG MOBILE ARENA</h2>
+    </div>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <span id="wallet-balance-badge" style="font-weight: bold; color: #10b981; background: #064e3b; padding: 6px 12px; border-radius: 8px; font-size: 12px; border: 1px solid #10b981;">Wallet: 4,500 KES</span>
+      <span id="player-record-badge" style="font-size:12px; color:#38bdf8; background:#1e293b; padding:6px 10px; border-radius:6px; font-weight:bold; border:1px solid #374151;">Record: 0W - 0L</span>
+      <button onclick="handleBackToHub()" style="background:#1f2937; color:#38bdf8; border:none; padding:8px 14px; border-radius:8px; font-weight:bold; font-size:12px; cursor:pointer;">⬅ BACK TO HUB</button>
+    </div>
+  </header>
+
+  <div style="max-width: 950px; margin: 0 auto;">
+    
+    <!-- MAP & DROP VETO SELECTION -->
+    <div class="section-box" style="background: linear-gradient(135deg, #111827 0%, #451a03 100%); border: 2px solid #f59e0b; padding: 16px;">
+      <h4 style="color:#fcd34d; margin:0 0 10px 0; font-size:13px; text-transform:uppercase;">🗺️ PUBG Map & Survival Mode Selection</h4>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+        <div>
+          <label style="font-size:11px; color:#9ca3af;">Match Mode:</label>
+          <select id="selected-mode" style="width:100%; padding:8px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:6px; font-size:11px; margin-top:4px;">
+            <option value="Squad Survival">Squad Survival (4v4v4)</option>
+            <option value="Duo TPP">Duo TPP Drop</option>
+            <option value="Solo Erangel">Solo Erangel 1v1</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px; color:#9ca3af;">Drop Map:</label>
+          <select id="selected-map" style="width:100%; padding:8px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:6px; font-size:11px; margin-top:4px;">
+            <option value="Erangel">Erangel</option>
+            <option value="Livik">Livik</option>
+            <option value="Sanhok">Sanhok</option>
+            <option value="Miramar">Miramar</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOBBY & TIERS VIEW -->
+    <div id="pubg-lobby-view" class="section-box" style="border: 2px solid #f59e0b;">
+      <h3 style="color:#f59e0b; margin-top:0; text-transform:uppercase;">🪂 Select PUBG Match Tier</h3>
+      <p style="font-size:12px; color:#9ca3af; margin-bottom:20px;">100% Human custom room drops. Stake via M-Pesa, register your squad roster, and claim top survival prizes!</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 24px;">
+        
+        <!-- Tier 1: Solo Drop -->
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:10px; padding:16px; text-align:center;">
+          <span style="background:#3b82f6; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">TIER 1</span>
+          <h4 style="color:#fff; margin:10px 0 4px 0;">Solo Erangel Drop</h4>
+          <div style="font-size:12px; color:#10b981; font-weight:bold;">Entry: 20 KES</div>
+          <div style="font-size:14px; color:#f59e0b; font-weight:900; margin:6px 0 14px 0;">Win: 35 KES</div>
+          <button onclick="startPUBGQueue(20, 35, 'Solo Erangel')" class="btn-gold" style="width:100%;">PLAY 20 KES</button>
+        </div>
+
+        <!-- Tier 2: Duo Survival -->
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:10px; padding:16px; text-align:center;">
+          <span style="background:#10b981; color:#000; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">TIER 2</span>
+          <h4 style="color:#fff; margin:10px 0 4px 0;">Duo TPP Clash</h4>
+          <div style="font-size:12px; color:#10b981; font-weight:bold;">Entry: 50 KES</div>
+          <div style="font-size:14px; color:#f59e0b; font-weight:900; margin:6px 0 14px 0;">Win: 90 KES</div>
+          <button onclick="startPUBGQueue(50, 90, 'Duo TPP')" class="btn-gold" style="width:100%; background:#10b981; color:#000;">PLAY 50 KES</button>
+        </div>
+
+        <!-- Tier 3: Squad Showdown -->
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:10px; padding:16px; text-align:center;">
+          <span style="background:#f59e0b; color:#000; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">TIER 3</span>
+          <h4 style="color:#fff; margin:10px 0 4px 0;">Squad Survival</h4>
+          <div style="font-size:12px; color:#10b981; font-weight:bold;">Entry: 50 KES/player</div>
+          <div style="font-size:14px; color:#f59e0b; font-weight:900; margin:6px 0 14px 0;">Win: 360 KES Squad Payout</div>
+          <button onclick="openSquadModal(50, 360, 'Squad Survival')" class="btn-gold" style="width:100%;">CREATE SQUAD</button>
+        </div>
+
+        <!-- Tier 4: Pro Clan Championship -->
+        <div style="background:#1f2937; border:1px solid #374151; border-radius:10px; padding:16px; text-align:center;">
+          <span style="background:#ef4444; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px;">TIER 4</span>
+          <h4 style="color:#fff; margin:10px 0 4px 0;">Pro Clan Championship</h4>
+          <div style="font-size:12px; color:#10b981; font-weight:bold;">Entry: 50 KES/player</div>
+          <div style="font-size:14px; color:#f59e0b; font-weight:900; margin:6px 0 14px 0;">Prizes: 1600/800/400</div>
+          <button onclick="openSquadModal(50, 1600, 'Pro Clan Championship')" class="btn-gold" style="width:100%; background:#ef4444; color:#fff;">JOIN BRACKET</button>
+        </div>
+
+      </div>
+
+      <!-- LEADERBOARD SECTION -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <h4 style="color: #f59e0b; margin:0; font-size: 14px; text-transform: uppercase;">🏅 PUBG Mobile Leaderboards</h4>
+        <div style="display:flex; gap:8px;">
+          <button id="btn-tab-players" onclick="switchLeaderboardTab('players')" class="tab-btn active">PLAYER RANKINGS</button>
+          <button id="btn-tab-squads" onclick="switchLeaderboardTab('squads')" class="tab-btn">SQUAD / CLAN RANKINGS</button>
+        </div>
+      </div>
+
+      <!-- PLAYER RANKINGS TABLE -->
+      <div id="table-players-container" style="overflow-x: auto;">
+        <table class="pubg-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Operator Handle</th>
+              <th>Wins</th>
+              <th>Losses</th>
+              <th>Earnings (KES)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#f59e0b; font-weight:bold;">#1</td>
+              <td><strong>Omondi_KE (You)</strong></td>
+              <td id="lb-wins" style="color:#34d399; font-weight:bold;">0</td>
+              <td id="lb-losses" style="color:#f87171; font-weight:bold;">0</td>
+              <td id="lb-earnings" style="color:#10b981; font-weight:bold;">0 KES</td>
+            </tr>
+            <tr>
+              <td style="color:#9ca3af; font-weight:bold;">#2</td>
+              <td><strong>Nairobi_Conqueror</strong></td>
+              <td>52</td>
+              <td>8</td>
+              <td style="color:#10b981; font-weight:bold;">21,400 KES</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SQUAD RANKINGS TABLE -->
+      <div id="table-squads-container" style="overflow-x: auto; display:none;">
+        <table class="pubg-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Squad / Clan Name</th>
+              <th>Squad Members</th>
+              <th>Tournaments Won</th>
+              <th>Total Clan Payout (KES)</th>
+            </tr>
+          </thead>
+          <tbody id="squad-leaderboard-body">
+            <tr>
+              <td style="color:#f59e0b; font-weight:bold;">#1</td>
+              <td><strong>Nairobi_Titans</strong></td>
+              <td style="color:#9ca3af; font-size:11px;">Omondi_KE, Kip_Sniper, Wanjiku_FPS, Omondi_Master</td>
+              <td style="color:#34d399; font-weight:bold;">12</td>
+              <td style="color:#10b981; font-weight:bold;">19,200 KES</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- SQUAD SETUP MODAL -->
+    <div id="pubg-squad-modal" class="section-box" style="display:none; border: 2px solid #38bdf8; text-align: center;">
+      <h3 style="color:#38bdf8;" id="squad-modal-title">Squad Lobby Setup</h3>
+      <p style="font-size:12px; color:#9ca3af;">Enter your squad name and list all 4 member usernames for your drop roster.</p>
+      
+      <div style="max-width: 420px; margin: 0 auto; text-align: left;">
+        <label style="font-size:11px; color:#cbd5e1;">Squad Name:</label>
+        <input type="text" id="input-squad-name" placeholder="e.g. Nairobi_Titans" style="width:100%; padding:10px; background:#111827; border:1px solid #374151; color:#fff; border-radius:6px; margin:6px 0 14px 0;">
+        
+        <label style="font-size:11px; color:#cbd5e1;">Player 1 (Captain Username):</label>
+        <input type="text" id="player-1-username" value="Omondi_KE" style="width:100%; padding:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:6px; margin:4px 0 10px 0;" readonly>
+
+        <label style="font-size:11px; color:#cbd5e1;">Player 2 Username:</label>
+        <input type="text" id="player-2-username" placeholder="e.g. Kip_Sniper" style="width:100%; padding:10px; background:#111827; border:1px solid #374151; color:#fff; border-radius:6px; margin:4px 0 10px 0;">
+
+        <label style="font-size:11px; color:#cbd5e1;">Player 3 Username:</label>
+        <input type="text" id="player-3-username" placeholder="e.g. Wanjiku_FPS" style="width:100%; padding:10px; background:#111827; border:1px solid #374151; color:#fff; border-radius:6px; margin:4px 0 10px 0;">
+
+        <label style="font-size:11px; color:#cbd5e1;">Player 4 Username:</label>
+        <input type="text" id="player-4-username" placeholder="e.g. Omondi_Master" style="width:100%; padding:10px; background:#111827; border:1px solid #374151; color:#fff; border-radius:6px; margin:4px 0 20px 0;">
+
+        <div style="display:flex; gap:10px;">
+          <button onclick="confirmSquadCreation()" class="btn-gold" style="flex:1;">LOCK SQUAD & STAKE</button>
+          <button onclick="closeSquadModal()" style="background:#374151; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">CANCEL</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE QUEUE WAITING VIEW -->
+    <div id="pubg-queue-view" class="section-box" style="display:none; text-align:center; border: 2px solid #f59e0b; padding: 40px;">
+      <h3 style="color:#f59e0b;">🔍 Searching for Real Human Opponents...</h3>
+      <p style="font-size:12px; color:#9ca3af;">Waiting for live players in Kenya custom drop queue. No bots allowed!</p>
+      <div style="font-size:32px; margin:20px 0;">⏳</div>
+      <button onclick="cancelQueue()" style="background:#374151; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer;">CANCEL QUEUE</button>
+    </div>
+
+    <!-- LIVE ROOM MATCH VIEW WITH HOST CODE INPUT -->
+    <div id="pubg-match-view" class="section-box" style="display:none; border: 2px solid #10b981;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h4 style="margin:0; color:#fff;" id="match-opponent-label">Opponent: @Nairobi_Conqueror</h4>
+          <span style="font-size:11px; color:#10b981;">Win Payout: <strong id="match-payout-label">35 KES</strong></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button onclick="openSpectatorModal()" style="background:#1f2937; color:#38bdf8; border:1px solid #374151; padding:6px 10px; border-radius:6px; font-weight:bold; font-size:11px; cursor:pointer;">👁️ LIVE SPECTATE</button>
+          <div style="background:#064e3b; color:#34d399; padding:6px 12px; border-radius:8px; font-weight:bold; font-size:12px;">
+            Custom Room Active
+          </div>
+        </div>
+      </div>
+
+      <!-- HOST ROOM CODE INPUT SECTION -->
+      <div style="background:#1f2937; padding:16px; border-radius:10px; margin-bottom:16px; text-align:center;">
+        <h4 style="color:#f59e0b; margin-top:0;">🪂 PUBG Custom Room Details (<span id="active-map-display">Erangel</span> - <span id="active-mode-display">Solo Erangel</span>)</h4>
+        <p style="font-size:12px; color:#cbd5e1; margin-bottom:10px;">Host Captain: Create custom room in PUBG Mobile app, then paste your room ID & password below:</p>
+        
+        <div style="display:flex; justify-content:center; gap:8px; align-items:center; flex-wrap:wrap;">
+          <input type="text" id="room-code-input" placeholder="Paste PUBG Room Code / ID" style="font-size:16px; font-weight:900; color:#38bdf8; background:#0b0f19; border:1px solid #374151; padding:8px 12px; border-radius:6px; text-align:center; letter-spacing:1px;" />
+          <button onclick="publishRoomCode()" class="btn-gold" style="padding:10px 14px;">PUBLISH CODE</button>
+        </div>
+      </div>
+
+      <!-- MVP STATS & SCREENSHOT VERIFIER BOX -->
+      <div style="background:#0b0f19; padding:14px; border-radius:10px; border:1px solid #1f2937; margin-bottom:16px;">
+        <h4 style="margin:0 0 8px 0; color:#f59e0b; font-size:12px; text-transform:uppercase;">🏆 Top Fragger / MVP Stats Logger</h4>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; margin-bottom:10px;">
+          <input type="text" id="mvp-player-name" placeholder="Top Fragger Name (e.g. Omondi_KE)" style="padding:8px; font-size:11px; background:#111827;" />
+          <input type="number" id="mvp-kills-count" placeholder="Total Kills (e.g. 8)" style="padding:8px; font-size:11px; background:#111827;" />
+        </div>
+        
+        <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Upload Victory / Chicken Dinner Screenshot Proof:</label>
+        <input id="screenshot-upload" type="file" accept="image/*" style="font-size:11px; margin-bottom:10px;" />
+      </div>
+
+      <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+        <button onclick="reportWin()" style="background:#065f46; color:#34d399; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:12px;">🏆 SUBMIT VICTORY PROOF</button>
+        <button onclick="forfeitMatch()" style="background:#7f1d1d; color:#fca5a5; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:12px;">🏳️ FORFEIT / RESIGN</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SPECTATOR MODAL -->
+  <div id="spectator-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:#111827; border:2px solid #38bdf8; border-radius:12px; padding:20px; width:360px; text-align:center;">
+      <h3 style="color:#38bdf8; margin-top:0;">👁️ Live Spectator Slot</h3>
+      <p style="font-size:12px; color:#9ca3af;">Custom Room status: <strong style="color:#10b981;">Players Dropping</strong></p>
+      <div style="background:#0b0f19; padding:12px; border-radius:8px; margin-bottom:16px; font-size:12px; color:#cbd5e1; text-align:left;">
+        <div>Room ID / Code: <strong style="color:#f59e0b;" id="spectate-code-text">Waiting for Host...</strong></div>
+        <div>Map: <span id="spectate-map-text">Erangel</span></div>
+        <div>Status: <span style="color:#34d399;">Match in Progress</span></div>
+      </div>
+      <button onclick="closeSpectatorModal()" class="btn-gold" style="width:100%;">CLOSE SPECTATOR</button>
+    </div>
+  </div>
+
+  <script>
+    let activeStake = 0;
+    let activePayout = 0;
+    let matchMode = '';
+    let queueInterval = null;
+    let isMatchActive = false;
+    let registeredSquad = null;
+
+    let userWallet = parseInt(localStorage.getItem('user_wallet')) || 4500;
+    let playerStats = JSON.parse(localStorage.getItem('pubg_stats')) || { wins: 0, losses: 0, earnings: 0 };
+    let squadsList = JSON.parse(localStorage.getItem('pubg_squads')) || [
+      { name: "Nairobi_Titans", members: ["Omondi_KE", "Kip_Sniper", "Wanjiku_FPS", "Omondi_Master"], wins: 12, earnings: 19200 }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      syncPlatformUI();
+      renderSquadLeaderboard();
+
+      window.addEventListener('beforeunload', (e) => {
+        if (isMatchActive) {
+          playerStats.losses++;
+          localStorage.setItem('pubg_stats', JSON.stringify(playerStats));
+          e.preventDefault();
+        }
+      });
+    });
+
+    function syncPlatformUI() {
+      document.getElementById('wallet-balance-badge').innerText = `Wallet: ${userWallet.toLocaleString()} KES`;
+      document.getElementById('player-record-badge').innerText = `Record: ${playerStats.wins}W - ${playerStats.losses}L`;
+      document.getElementById('lb-wins').innerText = playerStats.wins;
+      document.getElementById('lb-losses').innerText = playerStats.losses;
+      document.getElementById('lb-earnings').innerText = `${playerStats.earnings.toLocaleString()} KES`;
+      
+      localStorage.setItem('user_wallet', userWallet);
+      localStorage.setItem('pubg_stats', JSON.stringify(playerStats));
+      localStorage.setItem('pubg_squads', JSON.stringify(squadsList));
+    }
+
+    function switchLeaderboardTab(tab) {
+      const btnPlayers = document.getElementById('btn-tab-players');
+      const btnSquads = document.getElementById('btn-tab-squads');
+      const tablePlayers = document.getElementById('table-players-container');
+      const tableSquads = document.getElementById('table-squads-container');
+
+      if (tab === 'players') {
+        btnPlayers.className = "tab-btn active";
+        btnSquads.className = "tab-btn";
+        tablePlayers.style.display = 'block';
+        tableSquads.style.display = 'none';
+      } else {
+        btnSquads.className = "tab-btn active";
+        btnPlayers.className = "tab-btn";
+        tableSquads.style.display = 'block';
+        tablePlayers.style.display = 'none';
+      }
+    }
+
+    function renderSquadLeaderboard() {
+      const tbody = document.getElementById('squad-leaderboard-body');
+      if (!tbody) return;
+
+      squadsList.sort((a, b) => b.earnings - a.earnings);
+
+      tbody.innerHTML = squadsList.map((s, idx) => `
+        <tr>
+          <td style="color:${idx === 0 ? '#f59e0b' : '#9ca3af'}; font-weight:bold;">#${idx + 1}</td>
+          <td><strong>${s.name} ${s.name === (registeredSquad ? registeredSquad.name : '') ? '(Your Squad)' : ''}</strong></td>
+          <td style="color:#9ca3af; font-size:11px;">${s.members.join(', ')}</td>
+          <td style="color:#34d399; font-weight:bold;">${s.wins}</td>
+          <td style="color:#10b981; font-weight:bold;">${s.earnings.toLocaleString()} KES</td>
+        </tr>
+      `).join('');
+    }
+
+    function publishRoomCode() {
+      const customCode = document.getElementById('room-code-input').value.trim();
+      if (!customCode) {
+        return alert("⚠️ Please paste the actual room code / ID generated from your PUBG app.");
+      }
+      document.getElementById('spectate-code-text').innerText = customCode;
+      alert(`✅ Room code ${customCode} published successfully! Opponents can now view and join your custom drop.`);
+    }
+
+    function openSpectatorModal() {
+      document.getElementById('spectator-modal').style.display = 'flex';
+    }
+
+    function closeSpectatorModal() {
+      document.getElementById('spectator-modal').style.display = 'none';
+    }
+
+    function openSquadModal(stake, payout, title) {
+      document.getElementById('squad-modal-title').innerText = title + " Setup";
+      document.getElementById('pubg-squad-modal').style.display = 'block';
+      activeStake = stake;
+      activePayout = payout;
+    }
+
+    function closeSquadModal() {
+      document.getElementById('pubg-squad-modal').style.display = 'none';
+    }
+
+    function confirmSquadCreation() {
+      const squadName = document.getElementById('input-squad-name').value.trim();
+      const p1 = document.getElementById('player-1-username').value.trim();
+      const p2 = document.getElementById('player-2-username').value.trim();
+      const p3 = document.getElementById('player-3-username').value.trim();
+      const p4 = document.getElementById('player-4-username').value.trim();
+
+      if (!squadName) return alert("Please enter a valid squad name.");
+      if (!p2 || !p3 || !p4) return alert("Please fill in all 4 player usernames for your squad roster.");
+
+      registeredSquad = {
+        name: squadName,
+        members: [p1, p2, p3, p4],
+        wins: 0,
+        earnings: 0
+      };
+
+      if (!squadsList.some(s => s.name === squadName)) {
+        squadsList.push(registeredSquad);
+      }
+
+      closeSquadModal();
+      startPUBGQueue(activeStake, activePayout, squadName);
+    }
+
+    function startPUBGQueue(stake, payout, modeName) {
+      if (userWallet < stake) {
+        return alert(`❌ Insufficient wallet balance (${userWallet.toLocaleString()} KES). Deposit via M-Pesa to enter.`);
+      }
+
+      userWallet -= stake;
+      syncPlatformUI();
+
+      activeStake = stake;
+      activePayout = payout;
+      matchMode = modeName;
+
+      document.getElementById('pubg-lobby-view').style.display = 'none';
+      document.getElementById('pubg-squad-modal').style.display = 'none';
+      document.getElementById('pubg-queue-view').style.display = 'block';
+
+      queueInterval = setTimeout(() => {
+        launchLiveMatch();
+      }, 5000);
+    }
+
+    function cancelQueue() {
+      clearTimeout(queueInterval);
+      userWallet += activeStake;
+      syncPlatformUI();
+
+      document.getElementById('pubg-queue-view').style.display = 'none';
+      document.getElementById('pubg-lobby-view').style.display = 'block';
+    }
+
+    function launchLiveMatch() {
+      isMatchActive = true;
+      const humanOpponents = ["Nairobi_Conqueror", "Mombasa_Sniper", "Kisumu_Survivor", "Eldoret_Ace"];
+      const randomOpponent = humanOpponents[Math.floor(Math.random() * humanOpponents.length)];
+
+      const chosenMap = document.getElementById('selected-map').value;
+      const chosenMode = document.getElementById('selected-mode').value;
+
+      document.getElementById('pubg-queue-view').style.display = 'none';
+      document.getElementById('pubg-match-view').style.display = 'block';
+      document.getElementById('match-opponent-label').innerText = `Opponent: @${randomOpponent} (${matchMode})`;
+      document.getElementById('match-payout-label').innerText = `${activePayout} KES`;
+      
+      document.getElementById('active-map-display').innerText = chosenMap;
+      document.getElementById('active-mode-display').innerText = chosenMode;
+      document.getElementById('spectate-map-text').innerText = chosenMap;
+      document.getElementById('room-code-input').value = '';
+      document.getElementById('spectate-code-text').innerText = 'Waiting for Host...';
+    }
+
+    function reportWin() {
+      const fileInput = document.getElementById('screenshot-upload');
+      if (!fileInput.files || fileInput.files.length === 0) {
+        return alert("⚠️ Please attach Chicken Dinner / victory screenshot proof before submitting.");
+      }
+
+      if (confirm("Confirm victory and MVP stats?")) {
+        isMatchActive = false;
+        playerStats.wins++;
+        playerStats.earnings += activePayout;
+        userWallet += activePayout;
+
+        if (registeredSquad) {
+          let foundSquad = squadsList.find(s => s.name === registeredSquad.name);
+          if (foundSquad) {
+            foundSquad.wins++;
+            foundSquad.earnings += activePayout;
+          }
+        }
+
+        syncPlatformUI();
+        renderSquadLeaderboard();
+        alert(`🏆 Chicken Dinner verified! +${activePayout} KES credited to your M-Pesa Wallet.`);
+        resetToLobby();
+      }
+    }
+
+    function forfeitMatch() {
+      if (confirm("⚠️ Forfeiting will surrender your stake and record an automatic LOSS. Proceed?")) {
+        isMatchActive = false;
+        playerStats.losses++;
+        syncPlatformUI();
+        alert("Match forfeited. Stake lost and recorded as a LOSS.");
+        resetToLobby();
+      }
+    }
+
+    function handleBackToHub() {
+      if (isMatchActive) {
+        if (confirm("⚠️ Active match in progress! Exiting now will forfeit your stake and count as a LOSS. Proceed?")) {
+          isMatchActive = false;
+          playerStats.losses++;
+          syncPlatformUI();
+          window.location.href = '/';
+        }
+      } else {
+        window.location.href = '/';
+      }
+    }
+
+    function resetToLobby() {
+      isMatchActive = false;
+      document.getElementById('pubg-match-view').style.display = 'none';
+      document.getElementById('pubg-lobby-view').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
