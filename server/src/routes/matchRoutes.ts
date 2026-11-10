@@ -1,16 +1,21 @@
+// server/src/routes/mpesaRoutes.ts
 import { Router } from 'express';
-import {
-  createMatch,
-  getPendingMatches,
-  joinMatch,
-  completeMatch,
-} from '../controllers/matchController';
+import { initiateDeposit, handleCallback } from '../controllers/mpesaController';
 
 const router = Router();
 
-router.post('/create', createMatch);
-router.get('/pending', getPendingMatches);
-router.post('/join', joinMatch);
-router.post('/complete', completeMatch);
+/**
+ * @route   POST /api/mpesa/deposit
+ * @desc    Initiate an M-Pesa STK push for user deposits
+ * @access  Public (or Protected if you add auth middleware later)
+ */
+router.post('/deposit', initiateDeposit);
+
+/**
+ * @route   POST /api/mpesa/callback
+ * @desc    Receive transaction status updates/callbacks from Safaricom Daraja API
+ * @access  Public (Safaricom servers need open access to post here)
+ */
+router.post('/callback', handleCallback);
 
 export default router;
