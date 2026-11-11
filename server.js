@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Atlas Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://irungubenson441_db_user:<db_password>@ac-hmbvsrw-shard-00-00.7pjr8oa.mongodb.net:27017,ac-hmbvsrw-shard-00-01.7pjr8oa.mongodb.net:27017,ac-hmbvsrw-shard-00-02.7pjr8oa.mongodb.net:27017/?ssl=true&replicaSet=atlas-c6uaq7-shard-0&authSource=admin';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://irungubenson441_db_user:Benson2026@ac-hmbvsrw-shard-00-00.7pjr8oa.mongodb.net:27017,ac-hmbvsrw-shard-00-01.7pjr8oa.mongodb.net:27017,ac-hmbvsrw-shard-00-02.7pjr8oa.mongodb.net:27017/?ssl=true&replicaSet=atlas-c6uaq7-shard-0&authSource=admin';
 
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('MongoDB Connected Successfully'))
