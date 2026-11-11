@@ -1,8 +1,7 @@
-import { Request, Response } from 'express';
-import axios from 'axios';
+const axios = require('axios');
 
 // Helper to generate Safaricom timestamp (YYYYMMDDHHmmss)
-const getTimestamp = (): string => {
+const getTimestamp = () => {
   const date = new Date();
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -14,7 +13,7 @@ const getTimestamp = (): string => {
 };
 
 // Step 1: Generate OAuth Access Token from Daraja
-const getAccessToken = async (): Promise<string> => {
+const getAccessToken = async () => {
   const consumerKey = process.env.MPESA_CONSUMER_KEY || '';
   const consumerSecret = process.env.MPESA_CONSUMER_SECRET || '';
   const environment = process.env.MPESA_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
@@ -37,7 +36,7 @@ const getAccessToken = async (): Promise<string> => {
 /**
  * Step 2: Initiate STK Push (Lipa Na M-Pesa Online)
  */
-export const initiateDeposit = async (req: Request, res: Response): Promise<Response> => {
+const initiateDeposit = async (req, res) => {
   try {
     const { amount, phoneNumber } = req.body;
 
@@ -75,7 +74,7 @@ export const initiateDeposit = async (req: Request, res: Response): Promise<Resp
       BusinessShortCode: shortcode,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: 'CustomerPayBillOnline', // or 'CustomerBuyGoodsOnline' if using Till Number
+      TransactionType: 'CustomerPayBillOnline',
       Amount: Math.round(Number(amount)),
       PartyA: formattedPhone,
       PartyB: shortcode,
@@ -98,7 +97,7 @@ export const initiateDeposit = async (req: Request, res: Response): Promise<Resp
       data: darajaResponse.data
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('M-Pesa STK Push Error:', error.response?.data || error.message);
     return res.status(500).json({
       success: false,
@@ -111,7 +110,7 @@ export const initiateDeposit = async (req: Request, res: Response): Promise<Resp
 /**
  * Step 3: Handle Safaricom Daraja Webhook Callback
  */
-export const handleCallback = async (req: Request, res: Response): Promise<Response> => {
+const handleCallback = async (req, res) => {
   try {
     const callbackData = req.body;
     console.log('M-Pesa Callback Payload:', JSON.stringify(callbackData, null, 2));
@@ -119,7 +118,6 @@ export const handleCallback = async (req: Request, res: Response): Promise<Respo
     const stkCallback = callbackData.Body?.stkCallback;
     if (stkCallback) {
       const resultCode = stkCallback.ResultCode;
-      const merchantRequestId = stkCallback.MerchantRequestID;
       const checkoutRequestId = stkCallback.CheckoutRequestID;
 
       if (resultCode === 0) {
@@ -129,7 +127,7 @@ export const handleCallback = async (req: Request, res: Response): Promise<Respo
         let mpesaReceipt = '';
         let phoneNumber = '';
 
-        callbackMetadata?.forEach((item: { Name: string; Value: any }) => {
+        callbackMetadata?.forEach((item) => {
           if (item.Name === 'Amount') amountPaid = item.Value;
           if (item.Name === 'MpesaReceiptNumber') mpesaReceipt = item.Value;
           if (item.Name === 'PhoneNumber') phoneNumber = item.Value;
@@ -144,8 +142,13 @@ export const handleCallback = async (req: Request, res: Response): Promise<Respo
 
     // Always respond with 200 OK to acknowledge receipt to Safaricom
     return res.status(200).json({ ResultCode: 0, ResultDesc: 'Success' });
-  } catch (error: any) {
+  } catch (error) {
     console.error('M-Pesa Callback Processing Error:', error);
     return res.status(200).json({ ResultCode: 0, ResultDesc: 'Received with errors' });
   }
+};
+
+module.exports = {
+  initiateDeposit,
+  handleCallback
 };
