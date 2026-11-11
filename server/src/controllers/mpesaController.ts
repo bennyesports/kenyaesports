@@ -140,3 +140,7 @@ export const handleCallback = async (req: Request, res: Response): Promise<Respo
     return res.status(200).json({ ResultCode: 0, ResultDesc: 'Received with errors' });
   }
 };
+
+// Aliases to support any route imports looking for depositFunds or mpesaCallback
+export const depositFunds = initiateDeposit;
+export const mpesaCallback = handleCallback;
