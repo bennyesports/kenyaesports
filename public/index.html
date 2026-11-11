@@ -189,19 +189,32 @@
         <button id="tab-withdraw-btn" onclick="switchWalletTab('withdraw')" style="flex:1; padding:8px; font-weight:bold; font-size:11px; background:#1f2937; color:#fff; border:1px solid #374151; border-radius:6px; cursor:pointer;">WITHDRAW</button>
       </div>
 
-      <!-- Automated STK Push Deposit View (Till Number Removed) -->
+      <!-- Automated STK Push Deposit View (Till Number & M-Pesa Code Completely Removed) -->
       <div id="wallet-deposit-view">
         <p style="font-size:11px; color:#9ca3af; margin:0 0 10px 0;">Enter amount and your M-Pesa phone number to receive an instant STK push prompt.</p>
-        <input id="deposit-amount" type="number" placeholder="Amount (KES)" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
-        <input id="deposit-phone" type="text" placeholder="M-Pesa Phone (2547XXXXXXXX)" style="width:100%; padding:10px; margin-bottom:14px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
-        <button onclick="processStkPushDeposit()" class="btn-gold" style="width:100%; padding:10px; background:#10b981; color:#000; font-weight:bold; cursor:pointer;">TRIGGER M-PESA STK PUSH</button>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Amount (KES)</label>
+          <input id="deposit-amount" type="number" placeholder="50" min="10" />
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">M-Pesa Phone Number</label>
+          <input id="deposit-phone" type="text" placeholder="07XXXXXXXX" />
+        </div>
+        <button onclick="processStkPushDeposit()" class="btn-gold" style="width:100%; padding:12px; background:#10b981; color:#000; font-weight:bold; cursor:pointer;">SEND STK PUSH TO PHONE</button>
       </div>
 
+      <!-- Withdrawal View -->
       <div id="wallet-withdraw-view" style="display:none;">
         <p style="font-size:11px; color:#9ca3af; margin:0 0 10px 0;">Instant payout directly to your M-Pesa number.</p>
-        <input id="withdraw-phone" type="text" placeholder="M-Pesa Phone (2547XXXXXXXX)" style="width:100%; padding:10px; margin-bottom:10px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
-        <input id="withdraw-amount" type="number" placeholder="Amount (KES)" style="width:100%; padding:10px; margin-bottom:14px; background:#1f2937; border:1px solid #374151; color:#fff; border-radius:8px; font-size:12px;" />
-        <button onclick="processWithdraw()" class="btn-gold" style="width:100%; padding:10px; background:#f59e0b; color:#000;">WITHDRAW TO M-PESA</button>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Withdraw Amount (KES)</label>
+          <input id="withdraw-amount" type="number" placeholder="100" min="50" />
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Recipient M-Pesa Phone</label>
+          <input id="withdraw-phone" type="text" placeholder="07XXXXXXXX" />
+        </div>
+        <button onclick="processWithdraw()" class="btn-gold" style="width:100%; padding:12px; background:#f59e0b; color:#000;">WITHDRAW WINNINGS</button>
       </div>
     </div>
   </div>
