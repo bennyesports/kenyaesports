@@ -1,22 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+// Uses your Netlify environment variable, falling back to your Render backend if not set
+const API_URL = import.meta.env.VITE_API_URL || 'https://kenyaesports.onrender.com';
+
 function App() {
   const [events, setEvents] = useState([]);
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  // Fetch tournaments from your backend API
+  // Fetch tournaments from your backend API with fallback mock tournaments for testing
   useEffect(() => {
-    fetch('http://localhost:5000/api/events')
+    fetch(`${API_URL}/api/events`)
       .then(res => res.json())
       .then(data => {
-        if (data.success) {
+        if (data.success && data.events && data.events.length > 0) {
           setEvents(data.events);
+        } else {
+          // Fallback mock tournaments so you can test live payment right away
+          setEvents([
+            { _id: '1', title: 'FIFA 26 Pro Showdown', gameId: 'EA Sports FC', entryFee: 50, prizePool: 5000 },
+            { _id: '2', title: 'Comrades Ludo Championship', gameId: 'Ludo King Mobile', entryFee: 20, prizePool: 2000 }
+          ]);
         }
       })
-      .catch(err => console.error("Error fetching events:", err));
+      .catch(err => {
+        console.error("Error fetching events, loading fallback data:", err);
+        // Fallback mock tournaments on network error
+        setEvents([
+          { _id: '1', title: 'FIFA 26 Pro Showdown', gameId: 'EA Sports FC', entryFee: 50, prizePool: 5000 },
+          { _id: '2', title: 'Comrades Ludo Championship', gameId: 'Ludo King Mobile', entryFee: 20, prizePool: 2000 }
+        ]);
+      });
   }, []);
 
   // Handle M-Pesa Payment Trigger
@@ -30,20 +46,21 @@ function App() {
     setMessage('Sending STK Push prompt to your phone...');
 
     try {
-      const response = await fetch('http://localhost:5000/api/mpesa/stkpush', {
+      const response = await fetch(`${API_URL}/api/mpesa/deposit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, amount: fee })
+        body: JSON.stringify({ phoneNumber: phone, amount: fee })
       });
       const data = await response.json();
 
       if (data.success) {
-        setMessage('✅ STK Push prompt sent! Check your phone.');
+        setMessage('✅ STK Push prompt sent successfully! Check your phone.');
       } else {
-        setMessage('❌ Payment failed: ' + (data.error || 'Unknown error'));
+        setMessage('❌ Payment failed: ' + (data.message || data.error || 'Unknown error'));
       }
     } catch (error) {
-      setMessage('❌ Network error connecting to backend.');
+      console.error('M-Pesa Network Error:', error);
+      setMessage('❌ Network error connecting to Render backend.');
     } finally {
       setLoading(false);
     }
@@ -51,14 +68,14 @@ function App() {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '40px auto', padding: '20px', background: '#121212', color: '#fff', borderRadius: '10px' }}>
-      <h1 style={{ color: '#00ffcc', textAlign: 'center' }}>🎮 Esports Tournament Arena</h1>
+      <h1 style={{ color: '#00ffcc', textAlign: 'center' }}>🎮 KenyaEsports Tournament Arena</h1>
       <p style={{ textAlign: 'center', color: '#aaa' }}>Compete in top matches & pay instantly via M-Pesa STK Push</p>
 
       <div style={{ background: '#1e1e1e', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
         <h3>📱 Enter M-Pesa Number for Entry Fees</h3>
         <input 
           type="text" 
-          placeholder="e.g. 254741146267" 
+          placeholder="e.g. 254708374149" 
           value={phone} 
           onChange={(e) => setPhone(e.target.value)}
           style={{ padding: '10px', width: '100%', maxWidth: '300px', marginRight: '10px', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff' }}
@@ -67,7 +84,7 @@ function App() {
 
       <h2>🏆 Live Tournaments</h2>
       {events.length === 0 ? (
-        <p>Loading active tournaments from MongoDB Atlas...</p>
+        <p>Loading active tournaments...</p>
       ) : (
         events.map((ev) => (
           <div key={ev._id} style={{ background: '#1e1e1e', padding: '15px', borderRadius: '8px', marginBottom: '15px', borderLeft: '4px solid #00ffcc' }}>
