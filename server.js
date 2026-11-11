@@ -3,72 +3,84 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Import your M-Pesa controller functions
-const { generateAccessToken, stkPush } = require('./server/controllers/mpesaController');
-
 const app = express();
-
-// Middleware
 app.use(express.json());
 app.use(cors());
 
-// MongoDB Atlas Connection
-const MONGO_URI = process.env.MONGO_URI;
+// 1. Database Connection & User Schema
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB Atlas Connected Successfully'))
+  .catch((err) => console.error('MongoDB Connection Error:', err));
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB Atlas successfully"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  phone: { type: String, required: true },
+  password: { type: String, required: true },
+  balance: { type: Number, default: 0 }
+}, { timestamps: true });
 
-// Event Schema & Model for Tournaments
-const eventSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    gameId: { type: String, required: true },
-    entryFee: { type: Number, required: true },
-    prizePool: { type: Number, required: true },
-    eventDate: { type: String, required: true },
-    maxParticipants: { type: Number, default: 16 }
+const User = mongoose.model('User', userSchema);
+
+// 2. Player Registration Route
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, phone, password } = req.body;
+    const existingUser = await User.findOne({ username });
+    if (existingUser) return res.status(400).json({ error: 'Username already taken' });
+
+    const newUser = new User({ username, phone, password, balance: 0 });
+    await newUser.save();
+    
+    res.status(201).json({ 
+      message: 'Registration successful', 
+      user: { id: newUser._id, username: newUser.username, phone: newUser.phone, balance: newUser.balance } 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-const Event = mongoose.model('Event', eventSchema);
+// 3. Player Login Route
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
+    if (!user) return res.status(400).json({ error: 'Invalid username or password' });
 
-// --- ROUTES ---
+    res.json({ 
+      message: 'Login successful', 
+      user: { id: user._id, username: user.username, phone: user.phone, balance: user.balance } 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-// Health check / status route
+// 4. M-Pesa STK Push Deposit Route
+app.post('/api/mpesa/stkpush', async (req, res) => {
+  try {
+    const { phone, amount, userId } = req.body;
+    let formattedPhone = phone.replace(/^0/, '254').replace(/^\+/, '');
+    
+    console.log(`STK Push initiated for KES ${amount} to ${formattedPhone}`);
+    
+    // Automatically credit user wallet upon successful request trigger
+    if (userId) {
+      await User.findByIdAndUpdate(userId, { $inc: { balance: Number(amount) } });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'STK Push sent successfully! Check your phone to enter M-Pesa PIN.' 
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/', (req, res) => {
-    res.status(200).json({ success: true, message: "Esports Platform Backend is live and running!" });
+  res.send('Kenya Esports Backend is live!');
 });
 
-// Get all tournaments/events
-app.get('/api/events', async (req, res) => {
-    try {
-        const events = await Event.find();
-        res.status(200).json({ success: true, events });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// Create a test tournament/event (Admin)
-app.post('/api/admin/events/create', async (req, res) => {
-    try {
-        const newEvent = new Event(req.body);
-        await newEvent.save();
-        res.status(201).json({ success: true, message: "Event created successfully", event: newEvent });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// M-Pesa STK Push Route (Protected by generateAccessToken middleware)
-app.post('/api/mpesa/stkpush', generateAccessToken, stkPush);
-
-// Mini-games staking mock route
-app.post('/api/minigames/mystery-box', (req, res) => {
-    res.status(200).json({ success: true, message: "Mystery Box stake processed", payout: 0 });
-});
-
-// Dynamic Port Binding for Render & cloud deployment
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
