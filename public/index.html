@@ -441,8 +441,8 @@
     </p>
   </footer>
 
-  <!-- Script Imports -->
-  <script src="https://cdn.socket.io/4.7.2/socket.io.js"></script>
+  <!-- Script Imports (Using reliable Cloudflare CDN for Socket.IO) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
 
   <!-- Controller Script -->
   <script>
@@ -537,8 +537,15 @@
       renderGameCatalog();
       renderBracketTree();
 
+      const BACKEND_URL = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://kenyaesports.onrender.com';
+
       if (typeof io !== 'undefined') {
-        socket = io();
+        socket = io(BACKEND_URL);
+        
+        socket.on('connect', () => {
+          console.log('✅ Connected to WebSocket backend:', socket.id);
+        });
+
         socket.on('receive_chat_message', (data) => {
           const chatBox = document.getElementById('chat-box');
           if (chatBox) {
