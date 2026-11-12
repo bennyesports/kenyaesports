@@ -189,7 +189,7 @@
         <button id="tab-withdraw-btn" onclick="switchWalletTab('withdraw')" style="flex:1; padding:8px; font-weight:bold; font-size:11px; background:#1f2937; color:#fff; border:1px solid #374151; border-radius:6px; cursor:pointer;">WITHDRAW</button>
       </div>
 
-      <!-- Automated STK Push Deposit View (Till Number & M-Pesa Code Completely Removed) -->
+      <!-- Automated STK Push Deposit View -->
       <div id="wallet-deposit-view">
         <p style="font-size:11px; color:#9ca3af; margin:0 0 10px 0;">Enter amount and your M-Pesa phone number to receive an instant STK push prompt.</p>
         <div style="margin-bottom:10px;">
@@ -198,7 +198,7 @@
         </div>
         <div style="margin-bottom:14px;">
           <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">M-Pesa Phone Number</label>
-          <input id="deposit-phone" type="text" placeholder="07XXXXXXXX" />
+          <input id="deposit-phone" type="text" placeholder="2547XXXXXXXX" />
         </div>
         <button onclick="processStkPushDeposit()" class="btn-gold" style="width:100%; padding:12px; background:#10b981; color:#000; font-weight:bold; cursor:pointer;">SEND STK PUSH TO PHONE</button>
       </div>
@@ -212,7 +212,7 @@
         </div>
         <div style="margin-bottom:14px;">
           <label style="font-size:11px; color:#9ca3af; display:block; margin-bottom:4px;">Recipient M-Pesa Phone</label>
-          <input id="withdraw-phone" type="text" placeholder="07XXXXXXXX" />
+          <input id="withdraw-phone" type="text" placeholder="2547XXXXXXXX" />
         </div>
         <button onclick="processWithdraw()" class="btn-gold" style="width:100%; padding:12px; background:#f59e0b; color:#000;">WITHDRAW WINNINGS</button>
       </div>
@@ -442,7 +442,7 @@
   </footer>
 
   <!-- Script Imports -->
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.js"></script>
 
   <!-- Controller Script -->
   <script>
