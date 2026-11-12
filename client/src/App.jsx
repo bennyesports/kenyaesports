@@ -37,6 +37,17 @@ function App() {
       });
   }, []);
 
+  // Format phone number to standard 254XXXXXXXXX required by Safaricom Daraja API
+  const formatPhoneNumber = (phone) => {
+    let cleaned = phone.replace(/\D/g, ''); // Remove all non-numeric characters
+    if (cleaned.startsWith('0')) {
+      cleaned = '254' + cleaned.slice(1);
+    } else if (cleaned.startsWith('+254')) {
+      cleaned = cleaned.slice(1);
+    }
+    return cleaned;
+  };
+
   // Handle Automated M-Pesa STK Push Deposit
   const handleStkPushDeposit = async (e) => {
     e.preventDefault();
@@ -45,6 +56,7 @@ function App() {
       return;
     }
 
+    const formattedPhone = formatPhoneNumber(phoneNumber);
     setLoading(true);
     setMessage('Sending STK Push prompt to your phone...');
 
@@ -54,15 +66,15 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ phoneNumber, amount: Number(amount) })
+        body: JSON.stringify({ phoneNumber: formattedPhone, amount: Number(amount) })
       });
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
-        setMessage('✅ STK Push prompt sent! Check your phone to enter your PIN.');
+      if (response.ok && (data.success || data.ResponseCode === "0")) {
+        setMessage('✅ STK Push prompt sent! Check your phone to enter your M-Pesa PIN.');
       } else {
-        setMessage('❌ STK Push failed: ' + (data.message || data.error || 'Unknown error'));
+        setMessage('❌ STK Push failed: ' + (data.message || data.error || data.errorMessage || 'Unknown error'));
       }
     } catch (error) {
       console.error('STK Push Error:', error);
@@ -136,7 +148,7 @@ function App() {
                 <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#ccc' }}>M-Pesa Phone Number</label>
                 <input 
                   type="text" 
-                  placeholder="e.g. 254708374149" 
+                  placeholder="e.g. 0712345678 or 2547..." 
                   value={phoneNumber} 
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #444', background: '#222', color: '#fff', boxSizing: 'border-box' }}
